@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Google Play game services IDs.
+Save this file as res/values/games-ids.xml in your project.
+-->
+<resources>
+  <string name="app_id">834631676145</string>
+  <string name="achievement_completed_basic_training_1">CgkI8eGyn6UYEAIQAg</string>
+  <string name="achievement_completed_basic_training_2">CgkI8eGyn6UYEAIQAw</string>
+  <string name="achievement_completed_hurdle_training">CgkI8eGyn6UYEAIQBA</string>
+  <string name="achievement_100_inches_in_less_than_30_seconds">CgkI8eGyn6UYEAIQBQ</string>
+  <string name="achievement_100_inches_in_less_than_25_seconds">CgkI8eGyn6UYEAIQBg</string>
+  <string name="leaderboard_world_record_100_inch_sprint">CgkI8eGyn6UYEAIQAA</string>
+  <string name="leaderboard_european_record_100_inch_sprint">CgkI8eGyn6UYEAIQBw</string>
+</resources>
