@@ -73,7 +73,8 @@ public void drawBeginPositions(){
 		}
 		player.drawReadyPosition();
 	}
-	
+
+	parent.noTint();
 }
 	
 	public void updatePositions(){
@@ -87,9 +88,11 @@ public void drawBeginPositions(){
 			movingY=moveY;
 		
 		track.moveMe(movingY);
+		
+
 		moveBots();
 		player.moveMe(movingY);
-		
+		parent.noTint();
 		drawBotMarkers();
 	}
 	

@@ -56,6 +56,7 @@ public class Game extends PApplet{
 	float[] pbs;
 	
 	public void setup(){
+		size(displayWidth,displayHeight,P2D);
 		flashMessages=new ArrayList<String>();
 		pbs = new float[7];
 		flegs = loadImage("images/flegs.png");

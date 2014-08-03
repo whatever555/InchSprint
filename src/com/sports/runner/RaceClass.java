@@ -59,7 +59,12 @@ public class RaceClass extends Screen {
 	long longStartTime = 0;
 	long serverStartTime=0;
 
-	PImage[][][] runningSprites;
+	PImage[][] shoeSprites;
+	PImage[][] bodySprites;
+	PImage[][] outlineSprites;
+	PImage[][] tshirtSprites;
+	PImage[][] shortsSprites;
+	
 	int totalSpritesOnDisk=7;
 	
 	int trackInInches=100;
@@ -142,27 +147,48 @@ public class RaceClass extends Screen {
 		
 		public void loadSprites(){
 			
-			runningSprites=null;
+			
 			int spw = 120;
 			int sph=148;
 			System.gc();
+
+			PImage shoeBlock;
+			PImage bodyBlock;
+			PImage outlineBlock;
+			PImage tshirtBlock;
+			PImage shortsBlock;
 			
-			PImage spriteBlock;
-			runningSprites=new PImage[totalSpritesOnDisk][6][6];
+			shoeSprites = new PImage[6][6];
+			bodySprites = new PImage[6][6];
+			outlineSprites = new PImage[6][6];
+			tshirtSprites = new PImage[6][6];
+			shortsSprites = new PImage[6][6];
 			
-			for(int i=1;i<totalSpritesOnDisk+1;i++){
-			spriteBlock = parent.loadImage("images/runner"+i+".gif");
+
+			shoeBlock = parent.loadImage("images/runner/shoes.gif");
+			shortsBlock = parent.loadImage("images/runner/shorts.gif");
+			bodyBlock = parent.loadImage("images/runner/body.gif");
+			outlineBlock = parent.loadImage("images/runner/outline.gif");
+			tshirtBlock = parent.loadImage("images/runner/tshirt.gif");
 			   
 		    for(int x=0;x<6;x++)
 		    	for(int y=0;y<6;y++){
-		    		
-		    		runningSprites[i-1][x][y] = spriteBlock.get(spw*(int)x,sph*(int)y,spw,sph);
+
+		    		shoeSprites[x][y] = shoeBlock.get(spw*(int)x,sph*(int)y,spw,sph);
+		    		shortsSprites[x][y] = shortsBlock.get(spw*(int)x,sph*(int)y,spw,sph);
+		    		bodySprites[x][y] = bodyBlock.get(spw*(int)x,sph*(int)y,spw,sph);
+		    		outlineSprites[x][y] = outlineBlock.get(spw*(int)x,sph*(int)y,spw,sph);
+		    		tshirtSprites[x][y] = tshirtBlock.get(spw*(int)x,sph*(int)y,spw,sph);
 		    	
 		}
-		    spriteBlock=null;
+		    shoeBlock = null;
+			shortsBlock = null;
+			bodyBlock = null;
+			outlineBlock =null;
+			tshirtBlock = null;
 System.gc();
 		}
-		}
+		
 	  
 	
 		

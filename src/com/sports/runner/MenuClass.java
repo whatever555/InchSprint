@@ -143,7 +143,7 @@ public void showFastestLeaderboardOptions(){
 		buttons.add(new MenuButton(this,"25 Opponents",6,1));
 		buttons.add(new MenuButton(this,"30 Opponents",7,1));
 		buttons.add(new MenuButton(this,"35 Opponents",8,1));
-		buttons.add(new MenuButton(this,"40 Opponents",9,1));
+		buttons.add(new MenuButton(this,"40 Opponents",9,-1));
 		}else{
 			botCount=0;
 			showTimetrialOptions();

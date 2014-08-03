@@ -1,5 +1,6 @@
 package com.sports.runner;
 
+import android.graphics.Color;
 import processing.core.PImage;
 
 public class Athlete {
@@ -21,10 +22,12 @@ public class Athlete {
 	float jumpingTargetHeight=0;
 	
 	int mySpriteNum;
-	
-	int tintRed;
-	int tintBlue;
-	int tintGreen;
+
+	int bodyCol;
+	int tshirtCol;
+	int shortsCol;
+	int shoesCol;
+	int outlineCol;
 	
 	float atEaseSpeed;
 	
@@ -47,6 +50,14 @@ public class Athlete {
 		atEaseSpeed=(70-parent.random(50));
 		reset();
 		
+		int bcol = rand(200);
+		bodyCol = Color.rgb(255-bcol,240-bcol,240-bcol);
+		tshirtCol = Color.rgb(rand(255),rand(255),rand(255));
+		shortsCol = Color.rgb(rand(255),rand(255),rand(255));
+		int scol=rand(255);
+		shoesCol = Color.rgb(scol,scol,scol);
+		outlineCol = Color.rgb(0,0,0);
+		
 	}
 	int myY=-200;
 	float div =1;
@@ -56,9 +67,6 @@ public class Athlete {
 	int mh=(int) (sph/div);
 	int mw=(int) (spw/div);
 	public void reset(){
-		tintBlue=(int)parent.random(255);
-		tintGreen=(int)parent.random(255);
-		tintRed=(int)parent.random(255);
 		
 		div = (float)1.7+((float)(track)/(float)8);
 		mh = (int)((float)sph/div);
@@ -84,7 +92,9 @@ public class Athlete {
 	
 	
 	
-	
+	public int rand(int r){
+		return (int)parent.random(r);
+	}
 	
 	
 	public void moveMe(float moved){
@@ -184,14 +194,7 @@ public class Athlete {
 		myX+=40;
 		myX+=(parent.player.mw-mw);
 		if(myX+(int)(spw/div)>0&&myX<parent.parent.displayWidth){
-			if(parent.runningSprites!=null){
-
-				parent.parent.tint(255,parent.parent.max(1,130-track*3));
-				parent.parent.image(parent.shadow,myX-15, myY+mh-10+track/2,(float) (mw*1.5),parent.parent.max(1,18-track)); 
-			parent.parent.tint(tintRed,tintGreen,tintBlue);
-		  parent.parent.image(parent.runningSprites[mySpriteNum][(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
-		  parent.parent.noTint();
-			} parent.fill(250);
+			drawSprites(myX);
 		}
 		
 	}
@@ -205,16 +208,7 @@ public void drawReadyPosition(){
 		myX+=40;
 		myX+=(parent.player.mw-mw);
 		if(myX+(int)(spw/div)>0&&myX<parent.parent.displayWidth){
-			if(parent.runningSprites!=null){
-				parent.parent.tint(255,parent.parent.max(1,130-track*3));
-				parent.parent.image(parent.shadow,myX-15, myY+mh-10+track/2,(float) (mw*1.5),parent.parent.max(1,18-track));
-			
-				parent.parent.tint(tintRed,tintGreen,tintBlue);
-			
-		  parent.parent.image(parent.runningSprites[mySpriteNum][(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
-			parent.parent.noTint();
-			}
-			parent.fill(250);
+			drawSprites(myX);
 		}
 		
 	}
@@ -229,17 +223,31 @@ public void drawReadyPosition(){
 		
 		
 		if(myX+(int)(spw/div)>0&&myX<parent.parent.displayWidth){
-			if(parent.runningSprites!=null){
-				parent.parent.tint(255,parent.parent.max(1,130-track*3));
-				parent.parent.image(parent.shadow,myX-15, myY+mh-10+track/2,(float) (mw*1.5),parent.parent.max(1,18-track)); 
-			
-			parent.parent.tint(tintRed,tintGreen,tintBlue,255);
-			
-		  parent.parent.image(parent.runningSprites[mySpriteNum][(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
-		  parent.parent.noTint();	 
-			}parent.fill(250);
+			drawSprites(myX);
 		}
 		
+	}
+	
+	public void drawSprites(int myX){
+		if(parent.shoeSprites!=null){
+		//	parent.parent.tint(255,parent.parent.max(1,130-track*3));
+			int mxh=parent.parent.max(1,18-track);
+			parent.parent.image(parent.shadow,myX-15, myY+mh-mxh/2,(float) (mw*1.5),mxh); 
+		
+			parent.parent.tint(tshirtCol);
+		    parent.parent.image(parent.tshirtSprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
+		    parent.parent.tint(shortsCol);
+		    parent.parent.image(parent.shortsSprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
+		    parent.parent.tint(bodyCol);
+		    parent.parent.image(parent.bodySprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
+		    parent.parent.tint(shoesCol);
+		    parent.parent.image(parent.shoeSprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
+		    parent.parent.tint(tshirtCol);
+		    parent.parent.image(parent.outlineSprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
+		  
+	    
+	     
+		}
 	}
 
 }
