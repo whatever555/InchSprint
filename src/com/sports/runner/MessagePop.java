@@ -3,6 +3,8 @@ package com.sports.runner;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
+import android.graphics.Color;
+
 public class MessagePop {
 	Game parent;
 	String header;
@@ -19,9 +21,22 @@ public class MessagePop {
 	boolean active;
 	int alpha = 250;
 	MyCallback callback;
+	int creationMilliTime;
+	int minLifeMillis;
+	int style;
+	int format;
+	int bgCol;
 	
+	public MessagePop(Game parent,String header,MyCallback callback,int style,int format){
+		initMe(parent,header,callback,style,format);
+	}
 	public MessagePop(Game parent,String header,MyCallback callback){
+		initMe(parent,header,callback,1,1);
+	}
+	
+	public void initMe(Game parent,String header,MyCallback callback,int format,int style){
 		this.type=type;
+		this.style=style;
 		this.parent=parent;
 		this.header=header;
 		optionsStr=new ArrayList<String>();
@@ -30,6 +45,14 @@ public class MessagePop {
 		x=parent.displayWidth/24;
 		w=parent.displayWidth-x*2;
 		this.callback=callback;
+		creationMilliTime=parent.millis();
+		minLifeMillis = 1000;
+		bgCol=Color.argb(0,0,100,alpha);
+		if(style==2)
+			bgCol=Color.argb(100,100,250,alpha);
+		if(style==3)
+			bgCol=Color.argb(100,2500,100,alpha);
+		
 	}
 	
 	public void addOption(String str,Boolean isBut,int txtSize){
@@ -42,11 +65,25 @@ public class MessagePop {
 	
 	public void showMe(){
 		if(active){
-			parent.fill(0,100);
+			
+			if(format==2){
+				parent.textAlign(parent.CENTER);
+				yOff=3;
+				y = parent.displayHeight-(h+parent.displayHeight/12);
+			}
+			if(format==3){
+
+				yOff=3;
+				y = parent.displayHeight-((h*2)+parent.displayHeight/24);
+			}
+				parent.textFont(parent.messageFont);
+				
+			parent.noStroke();
+			parent.fill(0,200);
 			parent.rect(0,0,parent.displayWidth,parent.displayHeight);
 			
 			parent.textFont(parent.messageFont);
-		parent.fill(0,0,100,alpha);
+		parent.fill(bgCol);
 		parent.strokeWeight(2);
 		parent.stroke(255,alpha);
 		
@@ -55,6 +92,7 @@ public class MessagePop {
 
 		parent.noStroke();
 		drawStrings();
+			
 		
 		
 		}

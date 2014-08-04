@@ -5,7 +5,6 @@ import processing.core.PImage;
 
 public class Athlete {
 	
-	
 	RaceClass parent;
 	int track;
 	boolean bot;
@@ -18,10 +17,14 @@ public class Athlete {
 	boolean landed;
 	boolean finished=false;
 
+	float hurdleLag=0;
+	
+int hurdlesHit=0;
+	int XOFF=40;
+	
 	float jumpY=0;
 	float jumpingTargetHeight=0;
 	
-	int mySpriteNum;
 
 	int bodyCol;
 	int tshirtCol;
@@ -50,8 +53,10 @@ public class Athlete {
 		atEaseSpeed=(70-parent.random(50));
 		reset();
 		
-		int bcol = rand(200);
-		bodyCol = Color.rgb(255-bcol,240-bcol,240-bcol);
+		int bcol = rand(255);
+		int bcol2=parent.parent.max(bcol-20,rand(bcol));
+		int bcol3=parent.parent.max(bcol2-19,rand(bcol2));
+		bodyCol = Color.rgb(bcol,bcol2,bcol3);
 		tshirtCol = Color.rgb(rand(255),rand(255),rand(255));
 		shortsCol = Color.rgb(rand(255),rand(255),rand(255));
 		int scol=rand(255);
@@ -67,7 +72,7 @@ public class Athlete {
 	int mh=(int) (sph/div);
 	int mw=(int) (spw/div);
 	public void reset(){
-		
+		hurdlesHit=0;
 		div = (float)1.7+((float)(track)/(float)8);
 		mh = (int)((float)sph/div);
 		myY=(int) ((parent.trackHeight/((float)(track+2)/3))-(mh));
@@ -80,17 +85,11 @@ public class Athlete {
 		jumping=false;
 		landed=false;
 		distanceTravelled=0;
-
-		mySpriteNum = (int) (parent.random(parent.totalSpritesOnDisk));
+		finished=false;
 		
-		if(mySpriteNum<=0)
-			mySpriteNum=0;
-		
-		if(mySpriteNum>parent.totalSpritesOnDisk-1)
-		mySpriteNum=parent.totalSpritesOnDisk-1;
 	}
 	
-	
+	boolean onScreen=false;
 	
 	public int rand(int r){
 		return (int)parent.random(r);
@@ -99,7 +98,10 @@ public class Athlete {
 	
 	public void moveMe(float moved){
 		
-		
+		if(hurdleLag>0){
+			moved-=parent.parent.min(hurdleLag,moved);
+			hurdleLag-=4;
+		}
 		x+=moved/20;
 		distanceTravelled+=moved;
 		
@@ -128,7 +130,7 @@ public class Athlete {
 	
 		
 		if(jumpY<jumpingTargetHeight-1 && jumping==true){
-			jumpY+=(jumpingTargetHeight)/3;
+			jumpY+=(jumpingTargetHeight/3);
 		}else{
 			
 			if(jumpY>20){
@@ -143,6 +145,7 @@ public class Athlete {
 		if(jumpY>0){
 			x=0;
 			y=5;
+			
 			
 		}
 		
@@ -169,12 +172,14 @@ public class Athlete {
 		longEndTime = System.nanoTime();
 		myRaceTime=(float)((longEndTime-parent.longStartTime)/1000000000.0f);
 		
-		System.out.println("BOT_ FINISHED THE RACE IN: "+((floatEndTime-parent.floatStartTime)/1000));
+		//System.out.println("BOT_ FINISHED THE RACE IN: "+((floatEndTime-parent.floatStartTime)/1000));
 		if(!parent.player.finished)
 			parent.playerPosition++;
 		}
 		
 	}
+	
+	
 	
 	
 	
@@ -187,15 +192,10 @@ public class Athlete {
 		
 		
 		
-		//	div = (float) ((div)*((float)track+(-((float)(0.3)))));
-			int myX = (int) ((distanceTravelled-parent.player.distanceTravelled)/5);
-			
-
-		myX+=40;
-		myX+=(parent.player.mw-mw);
-		if(myX+(int)(spw/div)>0&&myX<parent.parent.displayWidth){
-			drawSprites(myX);
-		}
+		
+		
+		drawSprites();
+		
 		
 	}
 	
@@ -203,36 +203,38 @@ public void drawReadyPosition(){
 		
 		x = 2;
 		y = 5;
-	int myX = (int) ((distanceTravelled-parent.player.distanceTravelled)/5);
-			
-		myX+=40;
-		myX+=(parent.player.mw-mw);
-		if(myX+(int)(spw/div)>0&&myX<parent.parent.displayWidth){
-			drawSprites(myX);
-		}
+	
+		drawSprites();
+		
 		
 	}
 	
 	
 	public void drawMe(){
 	
+		 onScreen=false;
 		
-		int myX = (int) ((distanceTravelled-parent.player.distanceTravelled)/5);
-		myX+=40;
-		myX+=(parent.player.mw-mw);
+		drawSprites();
 		
-		
-		if(myX+(int)(spw/div)>0&&myX<parent.parent.displayWidth){
-			drawSprites(myX);
-		}
 		
 	}
 	
-	public void drawSprites(int myX){
+	public void drawSprites(){
+		
+		int myX = (int) ((distanceTravelled-parent.player.distanceTravelled)/5);
+		myX+=XOFF;
+		myX+=(parent.player.mw-mw);
+		
+		 float offX = (float)(myX/2.8);
+		 float nearX = myX-offX;
+		 myX = (int) (nearX+((offX/parent.track.barSize)*(myY-parent.track.trackHeight/parent.track.divAmt)));
+		 if(myX+(int)(mw)>0&&myX<parent.parent.displayWidth){
+			 onScreen=true;
 		if(parent.shoeSprites!=null){
-		//	parent.parent.tint(255,parent.parent.max(1,130-track*3));
+			parent.parent.tint(255,parent.parent.max(1,130-track*3));
 			int mxh=parent.parent.max(1,18-track);
-			parent.parent.image(parent.shadow,myX-15, myY+mh-mxh/2,(float) (mw*1.5),mxh); 
+			float mw2=(float) (mw*1+(parent.shadowWidth));
+			parent.parent.image(parent.shadow,myX+(mw/2)-(mw2/2), myY+mh-mxh/2,mw2,mxh); 
 		
 			parent.parent.tint(tshirtCol);
 		    parent.parent.image(parent.tshirtSprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
@@ -244,7 +246,7 @@ public void drawReadyPosition(){
 		    parent.parent.image(parent.shoeSprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
 		    parent.parent.tint(tshirtCol);
 		    parent.parent.image(parent.outlineSprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
-		  
+		}
 	    
 	     
 		}

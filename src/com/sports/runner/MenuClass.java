@@ -2,12 +2,12 @@ package com.sports.runner;
 
 import java.util.ArrayList;
 
-import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
-import android.view.KeyEvent;
 
 import com.swarmconnect.Swarm;
+import com.swarmconnect.SwarmActiveUser;
+import com.swarmconnect.delegates.SwarmLoginListener;
 
 public class MenuClass extends Screen{
 
@@ -15,7 +15,6 @@ public class MenuClass extends Screen{
 	
 	int scrollY=-100;
 
-	PImage bgImage;
 	PFont sportsFont;
 	
 	GameSounds gameSounds;
@@ -44,7 +43,7 @@ public class MenuClass extends Screen{
 		System.gc();
 		menuHeight=parent.displayHeight;
 		  sportsFont=parent.createFont("fonts/sport.ttf", 24, true);
-			bgImage = parent.loadImage("images/back.jpg");
+			
 		gameSounds=new GameSounds(parent);
 		gameSounds.loadSounds(new String[]{"click"},false);
 		buttons=new ArrayList<MenuButton>();
@@ -67,7 +66,11 @@ public class MenuClass extends Screen{
 		buttons=new ArrayList<MenuButton>();
 		
 		buttons.add(new MenuButton(this,"No Hurdles",0,-1));
-		buttons.add(new MenuButton(this,"Enable Hurdles",1,1));
+		
+		if(parent.trainingProgress>2)
+			buttons.add(new MenuButton(this,"Enable Hurdles",1,-1));
+		else
+		buttons.add(new MenuButton(this,"Enable Hurdles",1,1,"Requires completion of hurdle training"));
 		
 	}
 	
@@ -106,13 +109,13 @@ public class MenuClass extends Screen{
 		
 		buttons=new ArrayList<MenuButton>();
 		int tp = parent.trainingProgress;
-		System.out.println("TRAINGIN PROGRESS: "+parent.trainingProgress);
+		//System.out.println("TRAINGIN PROGRESS: "+parent.trainingProgress);
 		buttons.add(new MenuButton(this,"Practice Running",0,0-tp));
 		buttons.add(new MenuButton(this,"Practice Starts",1,1-tp));
-		buttons.add(new MenuButton(this,"Practice Hurldes",2,2-tp));
+		buttons.add(new MenuButton(this,"Practice Hurdles",2,2-tp));
 		
 		botCount=0;
-		raceMode="Time Trial";
+		raceMode="Practice";
 	}
 	
 	
@@ -192,14 +195,26 @@ public void showFastestLeaderboardOptions(){
 		
 		buttons=new ArrayList<MenuButton>();
 			
+		if(parent.trainingProgress>1){
 			buttons.add(new MenuButton(this,"Quick Race",0,-1));
 			buttons.add(new MenuButton(this,"Race",1,-1));
-			buttons.add(new MenuButton(this,"Time Trial",2,1));
+			buttons.add(new MenuButton(this,"Time Trial",2,-1));
+		}else{
+			buttons.add(new MenuButton(this,"Quick Race",0,1,"You must complete basic training to play"));
+			buttons.add(new MenuButton(this,"Race",1,1,"You must complete basic training to play"));
+			buttons.add(new MenuButton(this,"Time Trial",2,1,"Requires completion of basic training"));
+		}
 			buttons.add(new MenuButton(this,"Leaderboards",3,-1));
+		if(parent.trainingProgress>2){
 			buttons.add(new MenuButton(this,"Championship",4,-1));
+		}else{
+			buttons.add(new MenuButton(this,"Championship",4,1,"You must complete training to play"));
+		}
 			buttons.add(new MenuButton(this,"Training",5,-1));
 			buttons.add(new MenuButton(this,"Controls",6,-1));
-			buttons.add(new MenuButton(this,"Login",7,-1));
+			
+			if(parent.championshipProgress>20)
+			buttons.add(new MenuButton(this,"RATE",7,-1));
 			
 
 			
@@ -216,7 +231,7 @@ public void showFastestLeaderboardOptions(){
 	public void showScreen(){
 		
 		parent.background(230,0,0);
-		parent.image(bgImage,0,0,parent.displayWidth,parent.displayHeight);
+		parent.image(parent.bgImage,0,0,parent.displayWidth,parent.displayHeight);
 	//	parent.fill(200,200,9,120);
 	//	parent.rect(0,0,parent.displayWidth,parent.displayHeight);
 	
@@ -252,12 +267,17 @@ int bY=0;
 		if(!dragging || (parent.abs(bY - parent.mouseY)<10 && lastT - parent.millis() < 1000))
 		for(int i=0;i<buttons.size();i++){
 		if(buttons.get(i).hitMe(parent.mouseX, parent.mouseY)){
+				
+			parent.println("TRAINING PROGRESS "+parent.trainingProgress);
 			
-
 			gameSounds.playSound("click");
 			
+			
+			if (!Swarm.isLoggedIn()) {
+				Swarm.showLogin();
+			}else
 			if(buttons.get(i).LOCKED>0){
-				parent.showSingleMessagePop(new String[]{"Locked Content"},new MyCallback(){ 
+				parent.showSingleMessagePop(new String[]{"Locked Content",buttons.get(i).contentLockedMessage},new MyCallback(){ 
 					  public void onMessageClose(){ 
 					  }
 				});
@@ -296,6 +316,21 @@ int bY=0;
 				showOppositionOptions();
 			    
 			}else
+				if(buttons.get(i).text.indexOf("Practice")==0){
+
+					String[] str = buttons.get(i).text.split(" ");
+					if(str[1].equals("Running"))
+					raceLength = 40;
+					else if(str[1].equals("Hurdles")){
+						raceLength=70;
+						hurdlesOn=true;
+					}
+					else
+						raceLength=5;
+					practiceMode = (str[1]);
+					
+					beginRace();
+				}else
 			if(buttons.get(i).text.indexOf("Hurdles")>0){
 				hurdlesOn = true;
 				showOppositionOptions();
@@ -307,15 +342,6 @@ int bY=0;
 				
 			    
 			}else
-				if(buttons.get(i).text.indexOf("Practice")==0){
-
-					String[] str = buttons.get(i).text.split(" ");
-					raceLength = 5;
-					practiceMode = (str[1]);
-					beginRace();
-					
-				    
-				}else
 			if(buttons.get(i).text.indexOf("Opponent")>0){
 
 				String[] str = buttons.get(i).text.split(" ");

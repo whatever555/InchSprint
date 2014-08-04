@@ -16,8 +16,6 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
-import com.swarmconnect.NotificationAchievement;
-import com.swarmconnect.NotificationLeaderboard;
 import com.swarmconnect.Swarm;
 import com.swarmconnect.SwarmActiveUser;
 import com.swarmconnect.SwarmActiveUser.GotCloudDataCB;
@@ -29,9 +27,11 @@ public class Game extends PApplet{
 	
 	Vibrator v; // Vibrate for 500 milliseconds
 	
+	
 	PImage flegs;
 	int TouchEvents;
-	int trainingProgress=1;
+	int championshipProgress=0;
+	int trainingProgress=0;
 	Screen activeScreen;
 	MenuClass mainMenu;
 	BotRaceClass race;
@@ -39,6 +39,8 @@ public class Game extends PApplet{
 	PImage lockedImage;
 	PFont messageFont;
 	
+	
+	PImage bgImage;	
 	int setVarCount=0;
 
 	MessagePop controlsMP;
@@ -56,16 +58,22 @@ public class Game extends PApplet{
 	float[] pbs;
 	
 	public void setup(){
+		bgImage = loadImage("images/back.jpg");
 		size(displayWidth,displayHeight,P2D);
+		showLoadingMessage();
+    	
 		flashMessages=new ArrayList<String>();
 		pbs = new float[7];
+		for(int i = 0; i <pbs.length;i++){
+			pbs[i]=99999;
+		}
 		flegs = loadImage("images/flegs.png");
 		countryList=new String[]{"Afghanistan","Albania","Algeria","American Samoa","Andorra","Angola","Anguilla","Antigua and Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central African Republic","Chad","Chile","China","Christmas Island","Colombia","Comoros","Cook Islands","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Côte d'Ivoire","Democratic Republic of the Congo","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macao","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Martinique","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","Netherlands Antilles","New Zealand","Nicaragua","Niger","Nigeria","Niue","Norfolk Island","North Korea","Norway","Oman","Pakistan","Palau","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Pitcairn Islands","Poland","Portugal","Puerto Rico","Qatar","Republic of the Congo","Romania","Russian Federation","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Pierre","Saint Vicent and the Grenadines","Samoa","San Marino","Sao Tomé and Príncipe","Saudi Arabia","Senegal","Serbia and Montenegro","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Soloman Islands","Somalia","South Africa","South Georgia","South Korea","Soviet Union","Spain","Sri Lanka","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Tibet","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Turks and Caicos Islands","Tuvalu","UAE","Uganda","Ukraine","United Kingdom","United States of America","Uruguay","US Virgin Islands","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Wallis and Futuna","Yemen","Zambia","Zimbabwe"};
 		
 		countryName=getCountryName();
 		myFlag = getMyFlag();
 		
-		messageFont=createFont("fonts/messageFont.ttf", 34, true);
+		
 		
 		v= (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
 		
@@ -76,8 +84,8 @@ public class Game extends PApplet{
 		loaded=false;
 		noLoop();
 		background(200,200,230);
-		loadSwarm();
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
+		loadSwarm();
 	}
 	
 	public void showMessage(String message){
@@ -117,15 +125,26 @@ public class Game extends PApplet{
 	}
 	
 	public void draw(){
-		if(loaded)
+		if(loaded){
 		activeScreen.drawMe();
 		
 		activeMP.showMe();
 		
 		showFlashMessages();
+		}else{
+		showLoadingMessage();	
+		}
 	}
-	
-
+	public void showLoadingMessage(){
+		image(bgImage,0,0,displayWidth,displayHeight);
+		fill(30);
+		textSize(26);
+		textAlign(CENTER,CENTER);
+		messageFont=createFont("fonts/messageFont.ttf", 34, true);
+		filter(BLUR,2);
+		text("Loading...",displayWidth/2,displayHeight/2);
+		
+	}
 	public void showFlashMessages(){
 		if(race!=null)
 		if(race.raceOn==false)
@@ -179,7 +198,7 @@ public class Game extends PApplet{
 	
 	public void loadSwarm(){
 		
-		
+		Swarm.setAllowGuests(true);
 			Swarm.init(this, 12348, "4a2bcfb705936e7b715c61563c450636",mySwarmLoginListener);
 		
 			Swarm.addNotificationDelegate(new SwarmNotificationDelegate() {
@@ -243,12 +262,11 @@ if(message.indexOf("0:00:00")<0){
 	    Swarm.setInactive(this);
 	}
 	
-	public void startSwarm(){
-
-		Swarm.init(this, 12348, "4a2bcfb705936e7b715c61563c450636");
-	}
+	
 	public boolean surfaceKeyDown(int code, KeyEvent event) {
 		  if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+			  noStroke();
+			  noTint();
 			  noLoop();
 			  if(activeMP.active)
 			  hideMessages();
@@ -276,20 +294,30 @@ if(message.indexOf("0:00:00")<0){
 
 		
 		public void mousePressed(){
-			if(!activeMP.active)
+			if(!activeMP.active){
 			if(loaded)
 			activeScreen.mousePressed();
+
+			mouseDownOnMessage=false;
+			}else{
+				mouseDownOnMessage=true;
+			}
 		}
 		public void mouseReleased(){
 			
-			if(activeMP.active)
+			if(activeMP.active && mouseDownOnMessage==true){
+				if(millis() - activeMP.creationMilliTime > activeMP.minLifeMillis)
 				hideMessages();
+				mouseDownOnMessage=false;
+			}
 			else
 			if(loaded)
 			activeScreen.mouseReleased();
 			
 			
 		}
+		
+		boolean mouseDownOnMessage=false;
 
 		public void mouseDragged(){
 			if(!activeMP.active)
@@ -308,39 +336,67 @@ if(message.indexOf("0:00:00")<0){
 		    	// This method is called when the login process has started
 		    	// (when a login dialog is displayed to the user).
 		    	public void loginStarted() {
+		    		println("LOGIN STARTESD");
+		    		//getCloudVars();
 		    	}
 
 		    	// This method is called if the user cancels the login process.
 		    	public void loginCanceled() {
+
+		    		println("LOGIN CANCELLED");
+		    		getCloudVars();
 		    	}
 
 		    	// This method is called when the user has successfully logged in.
 		    	public void userLoggedIn(SwarmActiveUser user) {
-		    		
-		    		setFromCloud("Training Progress");
-		    		setFromCloud("Personal Best 60 Inches");
-		    		setFromCloud("Personal Best 100 Inches");
-		    		setFromCloud("Personal Best 200 Inches");
-		    		setFromCloud("Personal Best 400 Inches");
-		    		setFromCloud("Personal Best 800 Inches");
-		    		setFromCloud("Personal Best 1500 Inches");
-		    		setFromCloud("Personal Best Off The Blocks");
+		    		println("LOGIN LOGGED IN");
+		    		getCloudVars();
 		    		
 		    	}
 
 		    	// This method is called when the user logs out.
 		    	public void userLoggedOut() {
+		    		println("LOGIN LOGIN OUT");
+		    		getCloudVars();
 		    	}
 
 		    };
+		    
+		    public void getCloudVars(){
+		    	
+		    	setVarCount=0;
+	    		setFromCloud("Training Progress");
+	    		setFromCloud("Championship Progress");
+	    		setFromCloud("Personal Best 60 Inches");
+	    		setFromCloud("Personal Best 100 Inches");
+	    		setFromCloud("Personal Best 200 Inches");
+	    		setFromCloud("Personal Best 400 Inches");
+	    		setFromCloud("Personal Best 800 Inches");
+	    		setFromCloud("Personal Best 1500 Inches");
+	    		setFromCloud("Personal Best Off The Blocks");
+		    }
 		    
 			public boolean surfaceTouchEvent(MotionEvent event) {
 
 				 TouchEvents = event.getPointerCount();
 				
-				  
-				  if(TouchEvents>1){
+				
+				  if(loaded){
+				  if(TouchEvents>1 && race.player.jumpY<1 && race.jumpLoading==false && race.player.jumping==false){
 					  race.jumpLoading=true;
+				  }
+				  if(TouchEvents<2&&race.jumpLoading==true&&race.raceOn==true){
+					  if(race.jumpLoading && race.hurdlesOn==true){
+						  race.moveY+=(race.getLastY(mouseY)-race.lastY);
+							
+							
+							race.lastY=race.getLastY(mouseY);
+							race.player.jumping=true;
+							race.jumpLoading=false;
+							race.player.jumpingTargetHeight = (float) (race.track.hurdleHeight*1.5);
+							
+						}
+				  }
 				  }
 				  return super.surfaceTouchEvent(event);
 				}
@@ -358,6 +414,7 @@ if(message.indexOf("0:00:00")<0){
 				        if (data == null) {
 				        	paused=false;
 
+				    		println("DATANULL IN SAVE");
 					        updateLocalData(varName,newVal,"0");
 				            return;
 				        }
@@ -393,9 +450,17 @@ if(message.indexOf("0:00:00")<0){
 		        	else
 		        		trainingProgress=Integer.parseInt(data);
 		        	
-		        
+		       
 		        	
 		        }else
+		        	 if(varName.equals("Championship Progress")){
+				        	if(Integer.parseInt(data)<Integer.parseInt(newVal)){
+				        		Swarm.user.saveCloudData(varName, newVal);
+				        		championshipProgress=Integer.parseInt(newVal);
+				        	}
+				        	else
+				        		championshipProgress=Integer.parseInt(data);
+		        	 }else
 		        	if(varName.equals("Personal Best Off The Blocks")){
 		        		if(data.equals("0"))
 		        			data="999";
@@ -433,11 +498,10 @@ if(message.indexOf("0:00:00")<0){
 					    public void gotData(String data) {
 					        // Did our request fail (network offline, and uncached)?
 					        if (data == null) {
-					        
+
 					        	setVarCount++;
-							    if(setVarCount>7){
 							    	loadGame();
-							    }
+							    
 					            // Handle failure case.
 						    	paused=false;
 					            return;
@@ -452,6 +516,9 @@ if(message.indexOf("0:00:00")<0){
 					        if(varName.equals("Training Progress"))
 					        	trainingProgress=Integer.parseInt(data);
 					        
+					    	 if(varName.equals("Championship Progress"))
+						        	championshipProgress=Integer.parseInt(data);
+					    	 
 					        if(varName.indexOf("Personal Best")==0){
 					        	if(data.equals("0"))
 				        			data="9999";
@@ -474,7 +541,7 @@ if(message.indexOf("0:00:00")<0){
 					        
 					        paused=false;
 					        setVarCount++;
-						    if(setVarCount>7){
+						    if(setVarCount>8){
 						    	loadGame();
 						    }
 						    
@@ -508,10 +575,25 @@ if(message.indexOf("0:00:00")<0){
 				controlsMP.addOption("Tap anywhere to hide this message",true,14);
 			}
 			
+			public void showSingleMessagePop(String[] messages,MyCallback callback,int format,int style){
+				showTheSingleMessagePop(messages,callback,format,style);
+				
+				//TODO add continue buttons etc
+			}
 			public void showSingleMessagePop(String[] messages,MyCallback callback){
-				activeMP = new MessagePop(this,"Message",callback);
+				showTheSingleMessagePop(messages,callback,1,1);
+				
+				
+			}
+			
+			
+			public void showTheSingleMessagePop(String[] messages,MyCallback callback,int format,int style){
+				activeMP = new MessagePop(this,"Message",callback,format,style);
 				for(int i=0;i<messages.length;i++)
+					if(i==0)
 				activeMP.addOption(messages[i],false,20);
+					else
+				activeMP.addOption(messages[i],false,16);
 				activeMP.addOption("Tap anywhere to hide this message",true,14);
 				activeMP.active=true;
 				
@@ -590,6 +672,9 @@ if(message.indexOf("0:00:00")<0){
 									return 5;
 				return -1;
 			}
+			
+			
+			
 			
 			
 			

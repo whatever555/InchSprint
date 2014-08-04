@@ -22,10 +22,19 @@ public class MenuButton {
 	int LOCKED;
 	boolean tweening=false;
 	
+	String contentLockedMessage;
 	public MenuButton(MenuClass parent,String text,int index,int LOCKED){
+		initMe(parent,text,index,LOCKED,"");
+	}
+	
+	public MenuButton(MenuClass parent,String text,int index,int LOCKED,String contentLockedMessage){
+		initMe(parent,text,index,LOCKED,contentLockedMessage);
+	}
+	
+	public void initMe(MenuClass parent,String text, int index, int LOCKED,String contentLockedMessage){
 		this.parent=parent;
 		this.LOCKED=LOCKED;
-		
+		this.contentLockedMessage=contentLockedMessage;
 		this.text=text;
 		bgCol = Color.rgb(20,20,120);
 		bgColPressed = Color.rgb(0,0,100);
@@ -56,9 +65,12 @@ public class MenuButton {
 			parent.parent.fill(bgColPressed);	
 		parent.parent.stroke(240);
 		parent.parent.strokeWeight(1);
-		parent.parent.rect(x,showY,w,h,3);
-		
-		if(LOCKED >= 0 ){
+		try{
+		parent.parent.rect(x,showY,w,h,4);
+		}catch(Exception e){
+			parent.parent.rect(x,showY,w,h);	
+		}
+		if(LOCKED > 0 ){
 			parent.parent.image(parent.parent.lockedImage,x+(w-h),showY+(h/12),h-(h/3),h-(h/6));
 		}
 		

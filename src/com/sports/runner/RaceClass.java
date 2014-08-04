@@ -16,6 +16,9 @@ public class RaceClass extends Screen {
 	Game parent;
 	PImage shadow;
 	
+	float shadowWidth;
+
+	boolean raceCancelled=false;
 	boolean jumpingEnabled=false;
 	
 	float floatWaitTime;
@@ -30,6 +33,7 @@ public class RaceClass extends Screen {
 	String practiceMode;
 	boolean training;
 	int falseStarts = 0;
+	int maxFalseStarts = 3;
 	
 	boolean setSaid = false;
 	
@@ -37,7 +41,7 @@ public class RaceClass extends Screen {
 	boolean dragging=false;
 	int lastX=0;
 	int lastY=0;
-	
+	int r;
 	float moveY=0;
 	
 	boolean hurdlesOn=false;
@@ -77,7 +81,8 @@ public class RaceClass extends Screen {
 	
 	Intent menuIntent;
 	
-	
+
+	float[] finishTimes;
 	int falseStartCount = 0;
 	
 	public RaceClass(Game parent){
@@ -108,14 +113,27 @@ public class RaceClass extends Screen {
 		boolean startMeasured=false;
 		
 		public void setMeUpOnce(){
+
+			if(practiceMode.equals("Running")){
+				trackInInches=40;
+			}
+			if(practiceMode.equals("Hurdles")){
+				trackInInches=100;
+			}
+			shadowWidth = parent.random(1);
+			track=new Track(this,trackInInches,1,hurdlesOn);
 			displayMessageBool=true;
+			
+			
 			setMeUp();
+
+			player = new Player(this,1);
 		}
 		
 		public void setMeUp(){
-			
+track.reset();
+			raceCancelled=false;
 			falseStartCount=0;
-			player = new Player(this,1);
 			reactionSpeed=0;
 			if(practiceMode=="OFF")
 				training=false;
@@ -138,11 +156,11 @@ public class RaceClass extends Screen {
 			raceStage = 3;
 			
 			startMeasured=false;
-			
+			player.reset();
 		}
 		
 		public void loadSounds(){
-			gameSounds.loadSounds(new String[]{"gshot1","set"},false);
+			gameSounds.loadSounds(new String[]{"gshot1","set","hurdle_drop"},false);
 		}
 		
 		public void loadSprites(){
@@ -193,6 +211,8 @@ System.gc();
 	
 		
 		public void submitScore(float racetime){
+			
+			if(raceCancelled==false && training == false){
 			int leaderboardID = -1;
 			
 			if(trackInInches==800){
@@ -230,13 +250,20 @@ System.gc();
     			parent.flashMessages.add("New Personal Best Time!");
     		}
 			}
-			if(reactionSpeed<1){
+			}
+		}
+		
+		
+		public void submitReactionTime(){
+			if(!training){
+			if(reactionSpeed<1 && reactionSpeed>0 && raceCancelled==false){
 				if(reactionSpeed<parent.pbs[6]){
 			SwarmLeaderboard.submitScore(17101,reactionSpeed);
 			parent.saveToCloud("Personal Best Off The Blocks", ""+reactionSpeed);
 			parent.flashMessages.add("New Personal Best Reaction Speed!");
 				}
 			
+			}
 			}
 		}
 		
@@ -249,6 +276,7 @@ System.gc();
 					lastMillis = parent.millis();
 					dragging=false;
 					raceStage=4;
+					r=(int)parent.random(3);
 					startRace();
 			//	}
 			}
@@ -257,7 +285,7 @@ System.gc();
 			if(raceStage == 99){
 				
 					///if(millis()-lastMillis>=100){
-						if(dragging && player.jumping==false){
+						if(dragging){
 							//if(jumpLoading==false)
 							moveY+=(parent.min(parent.mouseY,track.trackY+track.trackDisplayHeight)-lastY);
 							
@@ -296,13 +324,58 @@ System.gc();
 					if(practiceMode.equals("Starts")){
 						if(reactionSpeed!=999999999){
 						parent.text("Reaction Speed:",parent.displayWidth/2,(parent.displayHeight/2)-40);
+						if(reactionSpeed>.5)
+						parent.fill(200,0,0);
+						else
+							if(reactionSpeed>=.3)
+								parent.fill(200,120,0);
+						if(reactionSpeed<.3){
+							parent.fill(0,200,0);
 						parent.text(""+reactionSpeed,parent.displayWidth/2,(parent.displayHeight/2));
+						parent.fill(255);
+						parent.text("Awesome",parent.displayWidth/2,(parent.displayHeight/2)+80);
+						
+						}else{
+						parent.text(""+reactionSpeed,parent.displayWidth/2,(parent.displayHeight/2));
+						parent.fill(255);
+						parent.text("Almost. Try get it below .3 seconds.",parent.displayWidth/2,(parent.displayHeight/2)+80);
+						}
+						parent.fill(255);
 						}
 						else{
-						parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-40);
-						parent.text("Don't run before the gun!",parent.displayWidth/2,(parent.displayHeight/2));
+						
+						if(r==1){
+							parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+							parent.text("Don't run before the gun!",parent.displayWidth/2,(parent.displayHeight/2));
+							}else
+							if(r==2){
+								parent.text("Fake Start!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+								parent.text("Practice, practice, practice...!",parent.displayWidth/2,(parent.displayHeight/2));
+							}else
+							if(r==3){
+								parent.text("Unlucky!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+								parent.text("The gun is shot just after the whistle!",parent.displayWidth/2,(parent.displayHeight/2));
+							}
 						}
 						
+					}else
+					if(practiceMode.equals("Hurdles")){
+						if(player.hurdlesHit>0){
+							
+							if(r==0){
+							parent.text("Ouch!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+							parent.text("Hurdles can be very difficult to master",parent.displayWidth/2,(parent.displayHeight/2));
+							}else
+							if(r==1){
+								parent.text("Close!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+								parent.text("Remeber to drag with two fingers and the release before jumping",parent.displayWidth/2,(parent.displayHeight/2));
+							}else
+							if(r==2){
+								parent.text("Getting Better!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+								parent.text("Try release both fingers just before reaching the hurdle",parent.displayWidth/2,(parent.displayHeight/2));
+							}
+						}
+					
 					}
 				}
 				
@@ -318,6 +391,7 @@ System.gc();
 				
 				}else{
 					parent.fill(255);
+					if(!training)
 					parent.text("Verifying Time",parent.displayWidth/2,(parent.displayHeight/2)+40);
 				}
 				if(!training)
@@ -335,19 +409,36 @@ System.gc();
 		
 		public void mousePressed(){
 			if(!startMeasured){
-				if(!raceOn){
+				if(!raceOn && raceCancelled==false){
+					raceCancelled=true;
 					reactionSpeed=999999999;
 					soundShotBeginRace(true);
+					if(!training){
+						falseStarts++;
+						parent.showSingleMessagePop(new String[]{"False Start!","",falseStarts+"/"+maxFalseStarts+" False starts","","Tap Screen to Restart",""},new MyCallback(){ 
+							  public void onMessageClose(){ 
+								  setMeUp();
+							  }
+						});
+					}
+
+					//todo//soundShotBeginRace(true);
 				}
 				else{
 					reactionSpeed = ((System.nanoTime()-longStartTime)/1000000000.0f);
-					if(reactionSpeed<.2f){
+					if(reactionSpeed<.3f){
 						if(training){
 						//SwarmAchievement.unlock(21413);
-						if(parent.trainingProgress<3){
-							parent.showSingleMessagePop(new String[]{"Content Unlocked!","Hurdle Practice now available"},null);
+						if(parent.trainingProgress<2){
+							parent.trainingProgress=2;
+							parent.showSingleMessagePop(new String[]{"Content Unlocked!","Hurdle Practice now available"},new MyCallback(){ 
+								  public void onMessageClose(){ 
+									  endRace(false);
+								  }
+							});
+
+							parent.saveToCloud("Training Progress", "2");
 						}
-						parent.saveToCloud("Training Progress", "3");
 						
 						}
 					}
@@ -365,9 +456,7 @@ System.gc();
 			
 			
 				
-			if((parent.TouchEvents>1 || dragging==true) && hurdlesOn){
-				jumpLoading=true;
-			}
+			
 
 			
 			dragging=true;
@@ -395,23 +484,17 @@ System.gc();
 		
 		
 		public void mouseDragged(){
-			if(parent.TouchEvents>1){
-				jumpLoading=true;
-				//jumpPower=mouseY;
-			}
+			
 		}
 		
 		
 		public void mouseReleased(){
+			if(dragging==true){
 			
-			if(jumpLoading && hurdlesOn==true){
-				player.jumping=true;
-				jumpLoading=false;
-				player.jumpingTargetHeight = (float) (track.hurdleHeight*1.8);
-			}
 			dragging=false;
 			moveY+=(getLastY(parent.mouseY)-lastY);
 			lastY=getLastY(parent.mouseY);
+			}
 		}
 		
 		float movingY=0;
@@ -419,22 +502,24 @@ System.gc();
 		
 		public void updatePositions(){
 		
-			if(player.jumping==false){
+			
 			if(moveY==0)
 				if(movingY>0)
 				movingY-=(movingY/2);
 				else
 				movingY+=(parent.abs(movingY/2));
 			else
+			
+			if(player.jumping==false){
 				movingY=moveY;
 			}else{
-				movingY = player.jumpY;
+			movingY += player.jumpingTargetHeight;
 			}
 		
 				if(millis()-lastTouchMillis>10000){
 					displayMessageBool=true;
 					parent.println("yes it has happened");
-					endRace();
+					endRace(false);
 				}
 			
 			track.moveMe(movingY);
@@ -467,18 +552,31 @@ System.gc();
 		}
 		
 		
-		public void endRace(){
+		public void endRace(boolean legitFinish){
 			
 			displayMessageBool=false;
 			
 			setSaid=false;
 			raceStage=5;
 			raceOn=false;
+			
 			if(practiceMode.equals("Running")){
-				if(parent.trainingProgress<2){
+				if(parent.trainingProgress<1){
 					parent.showSingleMessagePop(new String[]{"Content Unlocked!","'Starts' Practice now available"},null);
+					parent.trainingProgress=1;
+					parent.saveToCloud("Training Progress", "1");
+					
 				}
-				parent.saveToCloud("Training Progress", "2");
+			}
+			
+			if(practiceMode.equals("Hurdles") ){
+				if(player.hurdlesHit==0){
+				if(parent.trainingProgress<3){
+					parent.trainingProgress=3;
+					parent.showSingleMessagePop(new String[]{"Content Unlocked!","You can now compete in hurdle races"},null);
+					parent.saveToCloud("Training Progress", "3");
+				}
+				}
 			}
 			
 		}
@@ -501,6 +599,8 @@ System.gc();
 				if(raceStage==4){
 					if(practiceMode.equals("Running"))
 					beginRunningTraining();
+					else if(practiceMode.equals("Hurdles"))
+					beginHurdleTraining();
 					else if(practiceMode.equals("Starts"))
 					beginStartsTraining();
 					else
@@ -513,7 +613,7 @@ System.gc();
 			t.start();
 		}
 		
-		
+
 		public void beginRunningTraining(){
 			if(displayMessageBool){
 			parent.showSingleMessagePop(new String[]{"How To Run","Drag you fingers on the track below"},new MyCallback(){ 
@@ -526,9 +626,22 @@ System.gc();
 			}
 		}
 		
+
+		public void beginHurdleTraining(){
+			if(displayMessageBool){
+			parent.showSingleMessagePop(new String[]{"How To Jump","Drag two fingers on the track at the same time","","Run the length of the track without knocking any hurdles"},new MyCallback(){ 
+				  public void onMessageClose(){ 
+					  soundShotBeginRace(true);
+				  }
+			});
+			}else{
+				soundShotBeginRace(true);
+			}
+		}
+		
 		public void beginStartsTraining(){
 			if(displayMessageBool){
-			parent.showSingleMessagePop(new String[]{"Wait for the gun shot before running"},new MyCallback(){ 
+			parent.showSingleMessagePop(new String[]{"Wait for the gun shot before running","","Run the length of the track to complete training"},new MyCallback(){ 
 				  public void onMessageClose(){ 
 					  saySet((int)random(200)+200);
 				  }
@@ -548,8 +661,9 @@ System.gc();
 					try {
 						Thread.sleep(2000);
 						if(raceStage==99){
+							//submitReactionTime();
 							player.finished=true;
-						endRace();
+						endRace(false);
 						}
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
@@ -561,12 +675,17 @@ System.gc();
 			t.start();
 		}
 		
+		
+	
+		
+		
 		boolean raceBegan = false;
 		
-		
+		int currentRaceIndex=0;
 		
 		public void saySet(final int initialSleep){
-			
+			currentRaceIndex++;
+			final int CI = currentRaceIndex;
 			Thread t = new Thread() {
 				public void run() {
 					try {
@@ -574,7 +693,7 @@ System.gc();
 						gameSounds.playSound("set");
 						setSaid=true;
 						Thread.sleep((int)parent.random(1500)+1000);
-						
+						if(currentRaceIndex == CI)
 						soundShotBeginRace(false);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
@@ -656,8 +775,10 @@ System.gc();
 
 						
 						
-						
+						if(training){
 						submitScore(longRaceTime);
+						submitReactionTime();
+						}
 						if(longRaceTime<fastestTimeYet || fastestTimeYet==999999999){
 							fastestTimeYet=longRaceTime;
 						}

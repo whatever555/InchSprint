@@ -7,15 +7,35 @@ public class Player extends Athlete{
 	long serverTime=-1;
 	int framesHit = 0;
 	
-	
 	public Player(RaceClass parent,int track){
 		super(parent,track);
 		this.bot=false;
 
-		mySpriteNum=1;
 	}
 	
 
+		 public void moveMe(float moved){
+			 super.moveMe(moved);
+			 if(!finished && parent.hurdlesOn)
+				if((distanceTravelled)%(parent.track.ho)>parent.track.ho-parent.convertInchesToPixels((float)2) && 
+						(distanceTravelled)%(parent.track.ho)<parent.track.ho-parent.convertInchesToPixels((float).3)){
+					if(jumpY<parent.track.hurdleHeight/1.6 && jumping==false){
+						String entry = "("+((int)((distanceTravelled+parent.convertInchesToPixels(3))/parent.track.ho))+"-1)";
+						if(parent.track.knockedHurdles.indexOf(entry)==-1){
+							
+							parent.track.knockedHurdles+=entry;
+							parent.gameSounds.playSound("hurdle_drop",1,1,1);
+							hurdlesHit++;
+							hurdleLag= moved/2;
+							if(parent.practiceMode.equals("Hurdles")){
+								finished=true;
+								parent.endRace(false);
+								
+							}
+						}
+					}
+				}
+		 }
 		 
 	
 	public void endRace(){
@@ -29,7 +49,7 @@ public class Player extends Athlete{
 		
 		parent.verifyTime(parent.millis(),System.nanoTime());
 		System.gc();
-		parent.endRace();
+		parent.endRace(true);
 		
 		//parent.noLoop();
 		

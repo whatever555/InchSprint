@@ -33,4 +33,10 @@ public class GameSounds {
 		  sounds.get(soundName).start();
 	  }
 	  
+	  public void playSound(String soundName,float left, float right,float v){
+
+		  sounds.get(soundName).setVolume(left*v, right*v);
+		  sounds.get(soundName).start();
+	  }
+	  
 }

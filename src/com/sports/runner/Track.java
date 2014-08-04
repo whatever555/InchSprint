@@ -1,5 +1,6 @@
 package com.sports.runner;
 
+import android.graphics.Color;
 import processing.core.PGraphics;
 import processing.core.PImage;
 
@@ -14,24 +15,53 @@ float offsetX=0;
 int trackHeight = 180;
 float trackWidth = 0;
 
+float XDIV=5;
 float interfaceWidth=100;
 float interfaceHeight=100;
 
+float ho;
+float lo;
+
+int skyColour = Color.rgb(200,200,255);
 int trackY;
 int trackX;
 
+String knockedHurdles="";
 int trackDisplayWidth;
 int trackDisplayHeight;
 boolean hurdlesOn =false;
-int hurdleHeight=40;
+
+int lineCount = 200;
+int hurdleCount=0;
+int hurdleHeight=60;
 
 int colorIntensity;
 //PGraphics trackPG;
 int pdh,pdw;
+int dw;
+float m;
+int hurdDistributionSize;
+int lineDistributionSize;
+
+
+
+float topY;
+float bottomY;
+float barSize;
+
+
  public Track(RaceClass parent,int distance,int trackType,boolean hurdlesOn){
-	
+	 hurdDistributionSize=25;
+	 lineDistributionSize=25;
+	 m = (float)1.5;//sumthin to do with hurdles
+	 int rand = (int)parent.random(200);
+	 if(rand>50){
+		 rand = (int)parent.random(200);
+	 }
+	 skyColour = Color.rgb(200-rand,200-rand,255-rand);
 	this.hurdlesOn=hurdlesOn;
 	 this.parent=parent;
+	 dw = parent.parent.displayWidth;
 	 this.distance=distance;
 	 trackImage=parent.loadImage("images/tracks/"+trackType+".jpg");
 	 trackImageFlat=parent.loadImage("images/tracks/flat_"+trackType+".jpg");
@@ -50,12 +80,25 @@ int pdh,pdw;
 	 
 	 
 	 colorIntensity=(int) (100+parent.parent.random(155));
- 
+	 
+	 if(hurdlesOn)
+		 hurdleCount = (int) (distance/hurdDistributionSize);
+	 
+	// lineCount = (int) (distance/lineDistributionSize);
+	 
+	 parent.parent.println("HURDLE COUNT: "+hurdleCount +" TRACKWIDTH: "+trackWidth+" ");
+	 ho = parent.convertInchesToPixels(hurdDistributionSize);
+	 lo = parent.convertInchesToPixels(hurdDistributionSize);
+	 
+	 topY=(trackHeight/divAmt)-hurdleHeight;
+	 bottomY=trackHeight-hurdleHeight;
+	 barSize = bottomY-topY;
+	 knockedHurdles="";
  }
  
  public void moveMe(float y){
 	 offsetY+=y;
-	 offsetX+=(y/5);
+	 offsetX+=(y/XDIV);
 	 
 	 if(offsetX>parent.parent.displayWidth*2){
 		 offsetX-=parent.parent.displayWidth*2;
@@ -110,45 +153,53 @@ int pdh,pdw;
 		 parent.parent.rect(0,0, parent.parent.displayWidth,trackHeight);
 		 }
 
-	 int dw = parent.parent.displayWidth;
+	 
 	colorTrack(150);
 	 
 	 parent.parent.strokeWeight(0);
 	 parent.parent.rect(0,0,dw,trackHeight);
-	 parent.parent.stroke(200,120);
-	 parent.parent.strokeWeight(2);
-	 for(float i=3;i<=parent.parent.max(18,(parent.botCount+3));i++){
-		 parent.parent.line(0,(trackHeight/(i/3)),dw,(trackHeight/(i/3)));
-	 }
+	
 	 parent.parent.strokeWeight(0);
-	 parent.fill(200,200,255);
-	 parent.parent.rect(0,0,dw,(trackHeight/divAmt));
+	
 	 
 	 colorTrack(255);
 	 parent.parent.rect(0,trackHeight,dw,(trackHeight/9));
 	 parent.fill(0);
 	 parent.parent.rect(0,trackHeight+(trackHeight/9),dw,(trackHeight/15));
 	 
-	 parent.parent.strokeWeight(7);
-	 parent.parent.stroke(255,60);
 	
-	 float m = (float)1.5;
-	parent.parent.line((int)(dw*m-offsetX-(dw/2-(offsetX/2.8)))+30,(trackHeight/divAmt),(int)(dw*m-offsetX)+30,trackHeight);
-	 parent.parent.line((int)(dw*m-offsetX)+30,trackHeight,(int)(dw*m-offsetX)+30,trackHeight+(trackHeight/9));
-	  
+	 drawTrackVertiLines();
+	 
+	
+	 parent.parent.noStroke();
+	 parent.fill(skyColour);
+	 parent.parent.rect(0,0,dw,(trackHeight/divAmt));
+	 
+	 
+	 lastYY=-1;
+	 
+	 
+	 int hurdleID=0;
+	 for(float i=3;i<=parent.parent.max(18,(parent.botCount+3));i++){
+	
+		 parent.parent.stroke(255,150);
+		 parent.parent.strokeWeight(0);
+		 parent.parent.line(0,(trackHeight/(i/3)),dw,(trackHeight/(i/3)));
+		
+		 if(hurdlesOn){
+		 parent.parent.stroke(255);
+		 parent.parent.strokeWeight(5);
+		 drawHurdleStick((trackHeight/(i/3)),hurdleID);
+		 hurdleID++;
+		 }
+		
+	 }
 	 
 	 if(hurdlesOn){
-	 parent.parent.strokeWeight(10);
-	 parent.parent.stroke(255,255);
-		parent.parent.line((int)(dw*m-offsetX-(dw/2-(offsetX/2.8)))+30,(trackHeight/divAmt)-hurdleHeight,(int)(dw*m-offsetX)+30,trackHeight-hurdleHeight);
-		
-		
-		 parent.parent.strokeWeight(8);
-		 parent.parent.stroke(255,255);
-		parent.parent.line((int)(dw*m-offsetX)+30,trackHeight-hurdleHeight,(int)(dw*m-offsetX)+30,trackHeight+(trackHeight/9));
-		parent.parent.strokeWeight(4);
-		parent.parent.line((int)(dw*m-offsetX-(dw/2-(offsetX/2.8)))+30,(trackHeight/divAmt)-hurdleHeight,(int)(dw*m-offsetX-(dw/2-(offsetX/2.8)))+30,(trackHeight/divAmt));
-		}
+		// drawHurdles();
+		// parent.parent.line((int)(dw*m-offsetX)+30,trackHeight-(trackHeight/9)-(hurdleHeight),(int)(dw*m-offsetX)+30,trackHeight+(trackHeight/9));
+			
+	}
 		
 	 parent.parent.noStroke();
 	 parent.fill(0,125,0);
@@ -159,13 +210,101 @@ int pdh,pdw;
 	 
 	 
  }
+ 
+ public void reset(){
+	 
+	 knockedHurdles="";
+ }
  public void colorTrack(int alpha){
 	 parent.fill(colorIntensity,0,0,alpha);
 	 if(parent.training==true)
-	 parent.fill(0,0,colorIntensity,alpha);	
-	 else if(parent.raceMode.equals("Time Trial"))
 		parent.fill(0,colorIntensity/2,0,alpha);
+	 else if(parent.raceMode.equals("Time Trial"))
+		parent.fill(colorIntensity,colorIntensity/2,0,alpha);
  }
 
  
+ float lastYY;
+ public void drawHurdleStick(float yy,int hurdleID){
+	 
+	 
+	 if(lastYY!=-1){
+	for(int i=1;i<=hurdleCount;i++){
+		 float hurdleX = (ho*i);
+		 float hurdleDispX = (hurdleX/XDIV-(parent.player.distanceTravelled/XDIV) );
+		 float offX = (float)(hurdleDispX/2.8);
+		 float nearX = hurdleDispX-offX;
+		 
+		if(nearX<dw+parent.player.XOFF+20 && hurdleDispX+parent.player.XOFF>-20){
+		 
+		 
+	parent.parent.strokeWeight(3);
+	float compareVar = (yy-(float)trackHeight/(float)divAmt);
+		float hh1 = (float) (((float)hurdleHeight/barSize)*(compareVar+(barSize-compareVar)/3.5));
+	
+		 float newX = nearX+((offX/barSize)*(yy-trackHeight/divAmt))+4;
+		 
+		 float ke=0;//for knocked hurdles
+		 if(knockedHurdles.indexOf("("+i+"-"+hurdleID+")")>-1){
+			 ke=hh1;
+		 }
+		 //upright
+		 parent.parent.line(newX+2,yy+2,newX+2+ke,yy-hh1+ke);
+	
+		 compareVar = (lastYY-(float)trackHeight/(float)divAmt);
+		 float hh2 = (float) (((float)hurdleHeight/barSize)*(compareVar+(barSize-compareVar)/3.5));
+		 float newX2 = nearX+((offX/barSize)*(lastYY-trackHeight/divAmt))+4;
+		 
+		 
+		 //upright
+		 parent.parent.line(newX2-2,lastYY-2,newX2-2+ke,lastYY-2-hh2+ke);
+		 
+		 //bar
+		 if(hurdleID>0){
+
+				parent.parent.strokeWeight(5);
+		 parent.parent.line(newX+2+ke,yy-hh1+ke,newX2-2+ke,lastYY-2-hh2+ke);
+
+			parent.parent.strokeWeight(2);
+			parent.parent.stroke(255,200);
+		 parent.parent.line(newX+2+ke,yy-(hh1/2)+ke,newX2-2+ke,lastYY-2-(hh2/2)+ke);
+		 }
+		} 
+	}
+	 
+	 }
+	 lastYY=yy;
+	 
+	/* float hurldeSX = (int)(dw*m-offsetX-(dw/2-(offsetX/2.8)))+30;
+	 float hurldeSY = (trackHeight/divAmt)-hurdleHeight;
+	 
+	 parent.parent.line(hurdleSX,hurdleSY,(int)(dw*m-offsetX-(dw/2-(offsetX/2.8)))+30,(trackHeight/divAmt));
+		*/
+ }
+
+public void drawTrackVertiLines(){
+	// parent.parent.line((int)(dw*m-offsetX-(dw/2-(offsetX/2.8)))+30,(trackHeight/divAmt),(int)(dw*m-offsetX)+30,trackHeight);
+	// parent.parent.line((int)(dw*m-offsetX)+30,trackHeight,(int)(dw*m-offsetX)+30,trackHeight+(trackHeight/9));
+	  
+	 for(int i=0;i<lineCount;i++){
+	 
+	 float lineX = (lo*i)+parent.player.XOFF;
+	 float lineDispX = (lineX/XDIV-(parent.player.distanceTravelled/XDIV) );
+	 float offX = (float)(lineDispX/2.8);
+	 float nearX = lineDispX-offX;
+	 
+	if(nearX<dw+parent.player.XOFF+20 && lineDispX+parent.player.XOFF>-20){
+		parent.parent.strokeWeight(8);
+	 parent.parent.stroke(255,200);
+	 parent.parent.line(nearX,(float)trackHeight/(float)divAmt,lineDispX,trackHeight);
+	 parent.parent.line(lineDispX,trackHeight,lineDispX,trackHeight+trackHeight/9);
+	 
+	}
+	 }
+}
+
+
+public void drawFinishLine(){
+	
+}
 }

@@ -9,9 +9,8 @@ public class BotRaceClass extends RaceClass{
 
 	Game parent;
 	
-	Athlete[] bots;
+	Bot[] bots;
 	float[] speeds;
-	float[] finishTimes;
 	
 	
 	
@@ -21,41 +20,55 @@ public class BotRaceClass extends RaceClass{
 		loadMe();
 	}
 
+	public void setMeUpOnce(){
+
+		track=new Track(this,trackInInches,1,hurdlesOn);
+		displayMessageBool=true;
+		if(raceMode.equals("Time Trial") && !ghostType.equals("No Ghost Runner"))
+			botCount = 1;
+		bots = new Bot[botCount];
+		for(int i=0;i<bots.length;i++){
+			bots[i] = new Bot(this,i+2);
+		}
+		
+		setMeUp();
+
+		player = new Player(this,1);
+		
+	}
+	
 	
 	public void setMeUp(){
 		super.setMeUp();
-		parent.println("gtype: "+ghostType);
-		if(raceMode.equals("Time Trial") && !ghostType.equals("No Ghost Runner"))
-		botCount = 1;
 		
-		bots = new Athlete[botCount];
+		
 		speeds=new float[botCount];
 		finishTimes=new float[botCount];
 		
 
-		track=new Track(this,trackInInches,1,hurdlesOn);
+		
 		trackHeight = track.trackHeight;
 		for(int i=0;i<bots.length;i++){
-			bots[i] = new Athlete(this,i+2);
+			bots[i].reset();
 			float inchPerSec = 10 - parent.random(5);
 			finishTimes[i] = ((40+(trackInInches/10)) - parent.random(41));
 			//float speed = track.distance/inchPerSec;
 			speeds[i] = convertInchesToPixels(inchPerSec)/fps;
-			System.out.println("FinishTimes "+finishTimes[i]);
 		}
 
 		if(raceMode.equals("Time Trial") && !ghostType.equals("No Ghost Runner"))
 			finishTimes[0]=fastestTimeYet;
 		
 
-		player = new Player(this,1);
 		
 	}
 	
 public void soundShotBeginRace(boolean falseStart){
 	super.soundShotBeginRace(falseStart);
 	
+	if(!raceBegan && raceCancelled==false && bots!=null)
 	for(int i=0;i<bots.length;i++){
+		if(bots[i]!=null)
 		bots[i].startRace();
 	}
 }
