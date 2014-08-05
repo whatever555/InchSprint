@@ -16,7 +16,7 @@ public class Player extends Athlete{
 
 		 public void moveMe(float moved){
 			 super.moveMe(moved);
-			 if(!finished && parent.hurdlesOn)
+			 if(parent.hurdlesOn)
 				if((distanceTravelled)%(parent.track.ho)>parent.track.ho-parent.convertInchesToPixels((float)2) && 
 						(distanceTravelled)%(parent.track.ho)<parent.track.ho-parent.convertInchesToPixels((float).3)){
 					if(jumpY<parent.track.hurdleHeight/1.6 && jumping==false){

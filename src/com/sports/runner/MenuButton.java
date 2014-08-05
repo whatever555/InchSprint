@@ -58,22 +58,31 @@ public class MenuButton {
 	@SuppressWarnings("static-access")
 	public void drawMe(){
 		showY = y+parent.scrollY;
-		
+		int showCol = bgCol;
 		
 		parent.parent.fill(bgCol);
-		if(pressed)
+		if(pressed){
 			parent.parent.fill(bgColPressed);	
+			showCol=bgColPressed;
+		}
 		parent.parent.stroke(240);
 		parent.parent.strokeWeight(1);
+		
+		
+		
+		
 		try{
 		parent.parent.rect(x,showY,w,h,4);
 		}catch(Exception e){
 			parent.parent.rect(x,showY,w,h);	
 		}
+		
 		if(LOCKED > 0 ){
 			parent.parent.image(parent.parent.lockedImage,x+(w-h),showY+(h/12),h-(h/3),h-(h/6));
-		}
-		
+			parent.parent.showButton(x,y,w,h,showCol,text,parent.parent.lockedImage);
+		}else
+			parent.parent.showButton(x,y,w,h,showCol,text);
+		/*
 		parent.parent.fill(0);
 		parent.parent.textAlign(parent.parent.LEFT,parent.parent.CENTER);
 		parent.parent.text(text, 8+x-1, showY+(h/2)+1);
@@ -82,7 +91,7 @@ public class MenuButton {
 		parent.parent.textAlign(parent.parent.LEFT,parent.parent.CENTER);
 		parent.parent.text(text, 8+x+1, showY+(h/2));
 		
-		
+		*/
 		
 		animate();
 	}

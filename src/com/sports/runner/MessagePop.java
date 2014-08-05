@@ -39,6 +39,7 @@ public class MessagePop {
 		this.style=style;
 		this.parent=parent;
 		this.header=header;
+		this.format=format;
 		optionsStr=new ArrayList<String>();
 		optionsButs=new ArrayList<Boolean>();
 		txtSizes=new ArrayList<Integer>();
@@ -47,11 +48,11 @@ public class MessagePop {
 		this.callback=callback;
 		creationMilliTime=parent.millis();
 		minLifeMillis = 1000;
-		bgCol=Color.argb(0,0,100,alpha);
+		bgCol=Color.argb(alpha,0,0,100);
 		if(style==2)
-			bgCol=Color.argb(100,100,250,alpha);
+			bgCol=Color.argb(alpha,100,100,250);
 		if(style==3)
-			bgCol=Color.argb(100,2500,100,alpha);
+			bgCol=Color.argb(alpha,100,2500,100);
 		
 	}
 	
@@ -78,10 +79,11 @@ public class MessagePop {
 			}
 				parent.textFont(parent.messageFont);
 				
+				if(format==1){
 			parent.noStroke();
 			parent.fill(0,200);
 			parent.rect(0,0,parent.displayWidth,parent.displayHeight);
-			
+				}
 			parent.textFont(parent.messageFont);
 		parent.fill(bgCol);
 		parent.strokeWeight(2);

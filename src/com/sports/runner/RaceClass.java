@@ -139,7 +139,7 @@ track.reset();
 				training=false;
 			else{
 				training=true;
-				parent.flashMessages.add("Training Mode");
+				parent.flashMessages.add("Training Mode: "+practiceMode);
 			}
 			
 			if(training){
@@ -276,7 +276,7 @@ System.gc();
 					lastMillis = parent.millis();
 					dragging=false;
 					raceStage=4;
-					r=(int)parent.random(3);
+					r=(int)parent.random(4);
 					startRace();
 			//	}
 			}
@@ -333,29 +333,33 @@ System.gc();
 							parent.fill(0,200,0);
 						parent.text(""+reactionSpeed,parent.displayWidth/2,(parent.displayHeight/2));
 						parent.fill(255);
-						parent.text("Awesome",parent.displayWidth/2,(parent.displayHeight/2)+80);
+						parent.text("Awesome",parent.displayWidth/2,(parent.displayHeight/2)+40);
 						
 						}else{
 						parent.text(""+reactionSpeed,parent.displayWidth/2,(parent.displayHeight/2));
 						parent.fill(255);
-						parent.text("Almost. Try get it below .3 seconds.",parent.displayWidth/2,(parent.displayHeight/2)+80);
+						parent.text("Try get it below .3 seconds.",parent.displayWidth/2,(parent.displayHeight/2)+40);
 						}
 						parent.fill(255);
 						}
 						else{
 						
-						if(r==1){
+						if(r==0){
 							parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-40);
 							parent.text("Don't run before the gun!",parent.displayWidth/2,(parent.displayHeight/2));
 							}else
-							if(r==2){
-								parent.text("Fake Start!",parent.displayWidth/2,(parent.displayHeight/2)-40);
-								parent.text("Practice, practice, practice...!",parent.displayWidth/2,(parent.displayHeight/2));
+							if(r==1){
+								parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+								parent.text("Practice, practice, practice!",parent.displayWidth/2,(parent.displayHeight/2));
 							}else
-							if(r==3){
-								parent.text("Unlucky!",parent.displayWidth/2,(parent.displayHeight/2)-40);
-								parent.text("The gun is shot just after the whistle!",parent.displayWidth/2,(parent.displayHeight/2));
-							}
+								if(r==2){
+									parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+									parent.text("The gun comes just after the whistle!",parent.displayWidth/2,(parent.displayHeight/2));
+								}else
+									if(r==3){
+										parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+										parent.text("Wait for the gun/vibration",parent.displayWidth/2,(parent.displayHeight/2));
+									}
 						}
 						
 					}else
@@ -364,16 +368,21 @@ System.gc();
 							
 							if(r==0){
 							parent.text("Ouch!",parent.displayWidth/2,(parent.displayHeight/2)-40);
-							parent.text("Hurdles can be very difficult to master",parent.displayWidth/2,(parent.displayHeight/2));
+							parent.text("Hurdles can be difficult to master",parent.displayWidth/2,(parent.displayHeight/2));
 							}else
 							if(r==1){
 								parent.text("Close!",parent.displayWidth/2,(parent.displayHeight/2)-40);
-								parent.text("Remeber to drag with two fingers and the release before jumping",parent.displayWidth/2,(parent.displayHeight/2));
+								parent.text("Remember to drag with two fingers.",parent.displayWidth/2,(parent.displayHeight/2));
+								
 							}else
 							if(r==2){
 								parent.text("Getting Better!",parent.displayWidth/2,(parent.displayHeight/2)-40);
-								parent.text("Try release both fingers just before reaching the hurdle",parent.displayWidth/2,(parent.displayHeight/2));
-							}
+								parent.text("Release touch before reaching hurdle",parent.displayWidth/2,(parent.displayHeight/2));
+							}else
+								if(r==3){
+									parent.text("Nope!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+									parent.text("Run faster for longer jumps",parent.displayWidth/2,(parent.displayHeight/2));
+								}
 						}
 					
 					}
@@ -383,7 +392,7 @@ System.gc();
 				//	rect(0,0,parent.displayWidth,parent.displayHeight,3);
 					
 					parent.fill(255);
-					parent.text("Tap Screen to Try Again",parent.displayWidth/2,(parent.displayHeight/2)+40);
+					parent.text("Tap Screen to Try Again",parent.displayWidth/2,(parent.displayHeight/2)+80);
 					
 					if(parent.mousePressed){
 						setMeUp();
@@ -441,6 +450,19 @@ System.gc();
 						}
 						
 						}
+						
+						
+						parent.showSingleMessagePop(new String[]{"Tap Here to Advance","Next Stage: Hurdles Practice"},
+								new MyCallback(){ 
+							  public void onMessageClose(){ 
+								  if(parent.mouseY>parent.activeMP.y){
+								  practiceMode ="Hurdles";
+									parent.showRaceScreen(0,true,70,"Training","No Ghost","Hurdles");
+								  }else{
+									  setMeUp();
+								  }
+							  }
+						},2,2);
 					}
 				}
 				
@@ -565,8 +587,20 @@ System.gc();
 					parent.showSingleMessagePop(new String[]{"Content Unlocked!","'Starts' Practice now available"},null);
 					parent.trainingProgress=1;
 					parent.saveToCloud("Training Progress", "1");
+				
 					
 				}
+				parent.showSingleMessagePop(new String[]{"Tap Here to Advance","Next Stage: Starts Practice"},
+						new MyCallback(){ 
+					  public void onMessageClose(){ 
+						  if(parent.mouseY>parent.activeMP.y){
+						  practiceMode ="Starts";
+							parent.showRaceScreen(0,false,5,"Training","No Ghost","Starts");
+						  }else{
+							  setMeUp();
+						  }
+					  }
+				},2,2);
 			}
 			
 			if(practiceMode.equals("Hurdles") ){
@@ -616,7 +650,7 @@ System.gc();
 
 		public void beginRunningTraining(){
 			if(displayMessageBool){
-			parent.showSingleMessagePop(new String[]{"How To Run","Drag you fingers on the track below"},new MyCallback(){ 
+			parent.showSingleMessagePop(new String[]{"How To Run","Drag you fingers on the track below","Run the length of the track above"},new MyCallback(){ 
 				  public void onMessageClose(){ 
 					  soundShotBeginRace(true);
 				  }
@@ -629,7 +663,7 @@ System.gc();
 
 		public void beginHurdleTraining(){
 			if(displayMessageBool){
-			parent.showSingleMessagePop(new String[]{"How To Jump","Drag two fingers on the track at the same time","","Run the length of the track without knocking any hurdles"},new MyCallback(){ 
+			parent.showSingleMessagePop(new String[]{"How To Jump","Drag two fingers on the track at the same time",""," a) Run the length of the track"," b) Don't knock any hurdles"},new MyCallback(){ 
 				  public void onMessageClose(){ 
 					  soundShotBeginRace(true);
 				  }
@@ -641,7 +675,7 @@ System.gc();
 		
 		public void beginStartsTraining(){
 			if(displayMessageBool){
-			parent.showSingleMessagePop(new String[]{"Wait for the gun shot before running","","Run the length of the track to complete training"},new MyCallback(){ 
+			parent.showSingleMessagePop(new String[]{"Starts","Wait for the gun shot before running","Try get a reaction speed of less than .3 secs"},new MyCallback(){ 
 				  public void onMessageClose(){ 
 					  saySet((int)random(200)+200);
 				  }

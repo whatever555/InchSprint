@@ -26,8 +26,11 @@ import com.swarmconnect.delegates.SwarmNotificationDelegate;
 public class Game extends PApplet{
 	
 	Vibrator v; // Vibrate for 500 milliseconds
-	
-	
+
+	PImage buttonGraphic;
+	PImage buttonLeftGraphic;
+	PImage buttonRightGraphic;
+	PImage homeIcon;
 	PImage flegs;
 	int TouchEvents;
 	int championshipProgress=0;
@@ -43,6 +46,8 @@ public class Game extends PApplet{
 	PImage bgImage;	
 	int setVarCount=0;
 
+	
+	RaceSummary rc;
 	MessagePop controlsMP;
 	MessagePop activeMP;
 	boolean loaded=false;
@@ -58,6 +63,10 @@ public class Game extends PApplet{
 	float[] pbs;
 	
 	public void setup(){
+		homeIcon=loadImage("graphics/home.png");
+		buttonGraphic=loadImage("graphics/button.png");
+		buttonLeftGraphic=loadImage("graphics/buttonLeft.png");
+		buttonRightGraphic=loadImage("graphics/buttonRight.png");
 		bgImage = loadImage("images/back.jpg");
 		size(displayWidth,displayHeight,P2D);
 		showLoadingMessage();
@@ -86,6 +95,7 @@ public class Game extends PApplet{
 		background(200,200,230);
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		loadSwarm();
+		rc=new RaceSummary(this);
 	}
 	
 	public void showMessage(String message){
@@ -134,6 +144,7 @@ public class Game extends PApplet{
 		}else{
 		showLoadingMessage();	
 		}
+		rc.showHomeButton();
 	}
 	public void showLoadingMessage(){
 		image(bgImage,0,0,displayWidth,displayHeight);
@@ -147,11 +158,10 @@ public class Game extends PApplet{
 	}
 	public void showFlashMessages(){
 		if(race!=null)
-		if(race.raceOn==false)
 		if(flashMessages.size()>0){
 			showFlashMessage(flashMessages.get(0));
 			
-			if(millis() - flashTimer > 1000){
+			if(millis() - flashTimer > 2000){
 				flashMessages.remove(0);
 				flashTimer=millis();
 			}
@@ -594,6 +604,7 @@ if(message.indexOf("0:00:00")<0){
 				activeMP.addOption(messages[i],false,20);
 					else
 				activeMP.addOption(messages[i],false,16);
+				if(activeMP.format==1)
 				activeMP.addOption("Tap anywhere to hide this message",true,14);
 				activeMP.active=true;
 				
@@ -674,9 +685,44 @@ if(message.indexOf("0:00:00")<0){
 			}
 			
 			
+			public void showButton(int x, int y, int w, int h){
+				displayButton(x,y,w,h,-1,null,null);
+			}
+			public void showButton(int x, int y, int w, int h,int tintCol){
+				displayButton(x,y,w,h,tintCol,null,null);
+			}
+			public void showButton(int x, int y, int w, int h,int tintCol,String text){
+				displayButton(x,y,w,h,tintCol,text,null);
+			}
+			public void showButton(int x, int y, int w, int h,int tintCol,String text,PImage extraIcon){
+				displayButton(x,y,w,h,tintCol,text,extraIcon);
+			}
 			
-			
-			
+			public void displayButton(int x, int y, int w, int h,int tintCol,String text,PImage extraIcon){
+
+				if(tintCol>-1)
+					tint(tintCol);
+				
+				int sw=10;
+				image(buttonLeftGraphic,x,y,sw,h);
+				image(buttonGraphic,x+sw,y,w-(sw*2),h);
+				image(buttonRightGraphic,x+w-sw,y,sw,h);
+				
+				if(tintCol>-1)
+					noTint();
+				
+				if(text!=null){
+					textAlign(LEFT,CENTER);
+					text(text,x+sw,y+h/2);
+				}
+				
+				if(extraIcon!=null){
+					imageMode(CENTER);
+					image(extraIcon,x+w-sw-(h/2),y+(h/2),h,h);
+					imageMode(CORNER);
+				}
+				
+			}
 			
 			
 }
