@@ -11,6 +11,7 @@ import com.swarmconnect.delegates.SwarmLoginListener;
 
 public class MenuClass extends Screen{
 
+	String menuHeading = "Inch Sprint";
 	String practiceMode;
 	
 	int scrollY=-100;
@@ -26,9 +27,12 @@ public class MenuClass extends Screen{
 	
 	int raceLength = 100;
 	boolean hurdlesOn=false;
+	boolean longJumpOn=false;
 	String raceMode="Race";
 	int botCount = 0;
 	String ghostType;
+	
+	int top=20;
 	
 	  Game parent;
 	  
@@ -50,6 +54,7 @@ public class MenuClass extends Screen{
 		buttonHeight = parent.displayHeight/8;
 		buttonPaddingLeft = parent.displayWidth/20;
 		buttonPaddingTop=parent.displayHeight/60;
+		top = buttonHeight;
 		
 		beginAct();
 	}
@@ -58,11 +63,12 @@ public class MenuClass extends Screen{
 	public void beginRace(){
 		 
 		    
-		    parent.showRaceScreen(botCount,hurdlesOn,raceLength,raceMode,ghostType,practiceMode);
+		    parent.showRaceScreen(botCount,hurdlesOn,raceLength,raceMode,ghostType,practiceMode,raceAgainst,longJumpOn);
 		
 	}
 	public void showHurdleOptions(){
 		
+		menuHeading = "Hurdles";
 		buttons=new ArrayList<MenuButton>();
 		
 		buttons.add(new MenuButton(this,"No Hurdles",0,-1));
@@ -71,20 +77,31 @@ public class MenuClass extends Screen{
 			buttons.add(new MenuButton(this,"Enable Hurdles",1,-1));
 		else
 		buttons.add(new MenuButton(this,"Enable Hurdles",1,1,"Requires completion of hurdle training"));
+
+		
 		
 	}
 	
 	public void showTimetrialOptions(){
-		
+
+		menuHeading = "Time Trial";
 		buttons=new ArrayList<MenuButton>();
 		
 		buttons.add(new MenuButton(this,"No Ghost Runner",0,-1));
 		buttons.add(new MenuButton(this,"Include Ghost",1,-1));
 		
 	}
-	
+	String raceAgainst="session";
+	public void showGhostOptions(){
+
+		menuHeading = "Ghost Options";
+		buttons=new ArrayList<MenuButton>();
+		buttons.add(new MenuButton(this,"Race PB Ghost",0,-1));
+		buttons.add(new MenuButton(this,"Session Ghost",1,-1));
+	}
 	public void showRaceLengthOptions(){
-		
+
+		menuHeading = "Race Length";
 		buttons=new ArrayList<MenuButton>();
 		
 		buttons.add(new MenuButton(this,"60 Inches",0,-1));
@@ -97,43 +114,48 @@ public class MenuClass extends Screen{
 	}
 	
 	public void showLeaderboardOptions(){
-		
+
+		menuHeading = "Records";
 		buttons=new ArrayList<MenuButton>();
 		
-		buttons.add(new MenuButton(this,"Fastest Sprinters",0,-1));
+		buttons.add(new MenuButton(this,"Personal Records",0,-1));
 		buttons.add(new MenuButton(this,"World Records",1,-1));
 		
 	}
 	
 	public void showTrainingOptions(){
-		
+
+		menuHeading = "Training Menu";
 		buttons=new ArrayList<MenuButton>();
 		int tp = parent.trainingProgress;
 		//System.out.println("TRAINGIN PROGRESS: "+parent.trainingProgress);
 		buttons.add(new MenuButton(this,"Practice Running",0,0-tp));
 		buttons.add(new MenuButton(this,"Practice Starts",1,1-tp));
 		buttons.add(new MenuButton(this,"Practice Hurdles",2,2-tp));
+		buttons.add(new MenuButton(this,"Practice Long Jump",3,3-tp));
 		
 		botCount=0;
 		raceMode="Practice";
 	}
 	
 	
-public void showFastestLeaderboardOptions(){
-		
+public void showPersonalBestOptions(){
+
+	    menuHeading = "PB Records";
 		buttons=new ArrayList<MenuButton>();
-		
-		buttons.add(new MenuButton(this,"60 Inches Fastest",0,-1));
-		buttons.add(new MenuButton(this,"100 Inches Fastest",1,-1));
-		buttons.add(new MenuButton(this,"200 Inches Fastest",2,-1));
-		buttons.add(new MenuButton(this,"400 Inches Fastest",3,-1));
-		buttons.add(new MenuButton(this,"800 Inches Fastest",4,-1));
-		buttons.add(new MenuButton(this,"1500 Inches Fastest",5,-1));
+
+		buttons.add(new MenuButton(this,"60 Inches PB",0,-1));
+		buttons.add(new MenuButton(this,"100 Inches PB",1,-1));
+		buttons.add(new MenuButton(this,"200 Inches PB",2,-1));
+		buttons.add(new MenuButton(this,"400 Inches PB",3,-1));
+		buttons.add(new MenuButton(this,"800 Inches PB",4,-1));
+		buttons.add(new MenuButton(this,"1500 Inches PB",5,-1));
+		buttons.add(new MenuButton(this,"Off the Blocks PB",6,-1));
 		
 	}
 	
 	public void showOppositionOptions(){
-		
+		menuHeading = "Competitors";
 		if(!raceMode.equals("Time Trial")){
 		buttons=new ArrayList<MenuButton>();
 
@@ -166,15 +188,20 @@ public void showFastestLeaderboardOptions(){
 		parent.textFont(sportsFont);
 		menuHeight = buttons.size()*buttonHeight;
 		
-		if(scrollY<parent.displayHeight-menuHeight)
+		if(scrollY<parent.displayHeight-menuHeight+buttonPaddingTop)
 			scrollY+=((parent.displayHeight-menuHeight)-scrollY)/3;
-		if(scrollY>0)
-			scrollY-=(scrollY/3);
+		if(scrollY>top+buttonPaddingTop)
+			scrollY-=(scrollY/5);
 		
 		
 		showScreen();
+		showHeader();
 		
 	}
+	
+	public void showSwarmDashBoard(){
+		 Swarm.showDashboard();
+		 }
 	
 	public void p(String s){
 		System.out.println(s);
@@ -187,6 +214,8 @@ public void showFastestLeaderboardOptions(){
 	
 	
 	public void beginAct(){
+		menuHeading="Main Menu";
+		
 		practiceMode = "OFF";
 		ghostType="No Ghost";
 		botCount=1;
@@ -213,10 +242,24 @@ public void showFastestLeaderboardOptions(){
 			buttons.add(new MenuButton(this,"Training",5,-1));
 			buttons.add(new MenuButton(this,"Controls",6,-1));
 			
-			if(parent.championshipProgress>20)
-			buttons.add(new MenuButton(this,"RATE",7,-1));
+			int ai = 7;
+			if(parent.championshipProgress>20){
+			buttons.add(new MenuButton(this,"RATE",ai,-1));
+			ai++;
+			}
 			
+			if(Swarm.isLoggedIn()){
+				buttons.add(new MenuButton(this,"Account",ai,-1));
+				ai++;
+			}else{
 
+				buttons.add(new MenuButton(this,"Log In",ai,-1));
+				ai++;
+				
+				
+			}
+			buttons.add(new MenuButton(this,"Play Online",ai,1));
+			ai++;
 			
 			menuHeight = buttons.size()*buttonHeight;
 			
@@ -227,6 +270,20 @@ public void showFastestLeaderboardOptions(){
 		
 	}
 
+	public void showHeader(){
+		parent.fill(0);
+		parent.stroke(255);
+		parent.strokeWeight(0);
+		parent.rect(-2,-2,parent.displayWidth+4,buttonHeight+2);
+		parent.image(parent.homeIcon, buttonPaddingLeft, 4,buttonHeight-6,buttonHeight-6);
+		parent.textFont(parent.messageFont);
+		parent.textSize(22);
+		parent.textAlign(parent.CENTER,parent.CENTER);
+		parent.fill(255);
+		parent.text(menuHeading, parent.displayWidth/2,buttonHeight/2);
+		
+		
+	}
 	
 	public void showScreen(){
 		
@@ -283,9 +340,25 @@ int bY=0;
 				});
 			}else
 			
-			if(buttons.get(i).text.equals("Quick Race")){
-				parent.showRaceScreen(12,false,60,"Race","No Ghost",practiceMode);
-			}else
+				if(buttons.get(i).text.equals("Quick Race")){
+					parent.showRaceScreen(12,false,60,"Race","No Ghost",practiceMode,"session");
+				}else
+					if(buttons.get(i).text.equals("Account")){
+						showSwarmDashBoard();
+					}else
+						if(buttons.get(i).text.equals("Race PB Ghost")){
+						raceAgainst="PB";
+						showRaceLengthOptions();
+					}else
+						if(buttons.get(i).text.equals("Session Ghost")){
+						
+						raceAgainst="session";
+						showRaceLengthOptions();
+					}
+					
+					else
+				
+				
 				if(buttons.get(i).text.equals("Training")){
 					showTrainingOptions();
 				}else
@@ -302,7 +375,10 @@ int bY=0;
 			}else
 				if(buttons.get(i).text.indexOf("Ghost")>0){
 					ghostType = buttons.get(i).text;
-					showRaceLengthOptions();
+					if(!ghostType.equals("No Ghost"))
+						showGhostOptions();
+					else
+						showRaceLengthOptions();
 				}else
 			if(buttons.get(i).text.equals("Race")){
 				raceMode="Race";
@@ -316,6 +392,13 @@ int bY=0;
 				showOppositionOptions();
 			    
 			}else
+				if(buttons.get(i).text.indexOf(" PB")>-1){
+
+					String[] str = buttons.get(i).text.split(" ");
+					parent.showPersonalRecord(str[0]);
+					
+					
+				}else
 				if(buttons.get(i).text.indexOf("Practice")==0){
 
 					String[] str = buttons.get(i).text.split(" ");
@@ -324,9 +407,14 @@ int bY=0;
 					else if(str[1].equals("Hurdles")){
 						raceLength=70;
 						hurdlesOn=true;
+					}else 
+						if(str[1].equals("Long Jump")){
+						raceLength=100;
+						longJumpOn=true;
 					}
 					else
 						raceLength=5;
+					
 					practiceMode = (str[1]);
 					
 					beginRace();
@@ -350,9 +438,9 @@ int bY=0;
 				
 			    
 			}else
-				if(buttons.get(i).text.equals("Fastest Sprinters")){
+				if(buttons.get(i).text.equals("Personal Records")){
 			
-					showFastestLeaderboardOptions();
+					showPersonalBestOptions();
 					
 				    
 				}else

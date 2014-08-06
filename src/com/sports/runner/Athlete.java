@@ -5,6 +5,7 @@ import processing.core.PImage;
 
 public class Athlete {
 	
+	
 	RaceClass parent;
 	int track;
 	boolean bot;
@@ -17,14 +18,15 @@ public class Athlete {
 	boolean landed;
 	boolean finished=false;
 
+	int alpha=255;
 	float hurdleLag=0;
 	
 int hurdlesHit=0;
-	int XOFF=40;
+	int XOFF=45;
 	
 	float jumpY=0;
 	float jumpingTargetHeight=0;
-	
+	boolean ghost=false;
 
 	int bodyCol;
 	int tshirtCol;
@@ -86,7 +88,6 @@ int hurdlesHit=0;
 		landed=false;
 		distanceTravelled=0;
 		finished=false;
-		
 	}
 	
 	boolean onScreen=false;
@@ -172,7 +173,12 @@ int hurdlesHit=0;
 		longEndTime = System.nanoTime();
 		myRaceTime=(float)((longEndTime-parent.longStartTime)/1000000000.0f);
 		
-		//System.out.println("BOT_ FINISHED THE RACE IN: "+((floatEndTime-parent.floatStartTime)/1000));
+		if(parent.raceMode.equals("Time Trial") && track>1 ){
+			System.out.println("track = "+track);
+			System.out.println(parent.fastestTimeYet+" BOT was supposedto finish IN: "+(parent.finishTimes[track-2]));
+		}
+			
+		System.out.println("BOT_ FINISHED THE RACE IN: "+((floatEndTime-parent.floatStartTime)/1000));
 		if(!parent.player.finished)
 			parent.playerPosition++;
 		}
@@ -214,6 +220,7 @@ public void drawReadyPosition(){
 	
 		 onScreen=false;
 		
+		
 		drawSprites();
 		
 		
@@ -231,20 +238,20 @@ public void drawReadyPosition(){
 		 if(myX+(int)(mw)>0&&myX<parent.parent.displayWidth){
 			 onScreen=true;
 		if(parent.shoeSprites!=null){
-			parent.parent.tint(255,parent.parent.max(1,130-track*3));
+			parent.parent.tint(255,parent.parent.min(alpha,parent.parent.max(1,130-track*3)));
 			int mxh=parent.parent.max(1,18-track);
 			float mw2=(float) (mw*1+(parent.shadowWidth));
 			parent.parent.image(parent.shadow,myX+(mw/2)-(mw2/2), myY+mh-mxh/2,mw2,mxh); 
 		
-			parent.parent.tint(tshirtCol);
+			parent.parent.tint(tshirtCol,alpha);
 		    parent.parent.image(parent.tshirtSprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
-		    parent.parent.tint(shortsCol);
+		    parent.parent.tint(shortsCol,alpha);
 		    parent.parent.image(parent.shortsSprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
-		    parent.parent.tint(bodyCol);
+		    parent.parent.tint(bodyCol,alpha);
 		    parent.parent.image(parent.bodySprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
-		    parent.parent.tint(shoesCol);
+		    parent.parent.tint(shoesCol,alpha);
 		    parent.parent.image(parent.shoeSprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
-		    parent.parent.tint(tshirtCol);
+		    parent.parent.tint(tshirtCol,alpha);
 		    parent.parent.image(parent.outlineSprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
 		}
 	    

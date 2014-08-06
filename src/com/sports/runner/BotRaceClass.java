@@ -31,6 +31,13 @@ public class BotRaceClass extends RaceClass{
 			bots[i] = new Bot(this,i+2);
 		}
 		
+		fastestTimeYet=999999999;
+		
+		if(raceMode.equals("Time Trial"))
+		if(raceAgainst.equals("PB"))
+		fastestTimeYet = parent.pbs[parent.getRaceIndex(trackInInches,hurdlesOn)];
+		
+		
 		setMeUp();
 
 		player = new Player(this,1);
@@ -56,14 +63,18 @@ public class BotRaceClass extends RaceClass{
 			speeds[i] = convertInchesToPixels(inchPerSec)/fps;
 		}
 
-		if(raceMode.equals("Time Trial") && !ghostType.equals("No Ghost Runner"))
-			finishTimes[0]=fastestTimeYet;
 		
-
+		if(raceMode.equals("Time Trial") && !ghostType.equals("No Ghost Runner")){
+			finishTimes[0]=fastestTimeYet;
+			bots[0].alpha=80;
+			bots[0].ghost=true;
+		}
+		
 		
 	}
 	
 public void soundShotBeginRace(boolean falseStart){
+	
 	super.soundShotBeginRace(falseStart);
 	
 	if(!raceBegan && raceCancelled==false && bots!=null)
@@ -75,12 +86,16 @@ public void soundShotBeginRace(boolean falseStart){
 
 public void drawBeginPositions(){
 	track.moveMe(0);
+	
 	if(!setSaid){
+		if(!(raceMode.equals("Time Trial") && fastestTimeYet == 999999999))
 		for(int i=bots.length-1;i>=0;i--){
+		
 		bots[i].drawSetPosition();
 	}
 	player.drawSetPosition();
 	}else{
+		if(!(raceMode.equals("Time Trial") && fastestTimeYet == 999999999))
 		for(int i=bots.length-1;i>=0;i--){
 			bots[i].drawReadyPosition();
 		}
@@ -134,17 +149,17 @@ public void drawBeginPositions(){
 			float timeGone = (parent.millis()-floatStartTime)/1000;
 			float timeLeft = finishTimes[i]-timeGone;
 			//3000 50000
-			if(timeLeft<0){
-				if(distanceLeft>0)
+			if(timeLeft<=0.0){
+				if(distanceLeft>=0)
 					mSpeed=distanceLeft+2;
 				else
 				mSpeed=bots[i].atEaseSpeed;
 			}
 			else
-				mSpeed=(distanceLeft/timeLeft)/parent.frameRate;
+				mSpeed=(distanceLeft/timeLeft)/(parent.frameRate);
 			if(raceMode.equals("Time Trial") && !ghostType.equals("No Ghost Runner")){
 if(fastestTimeYet!=999999999){
-	parent.tint(255,80);
+	
 				bots[i].moveMe(mSpeed);
 				parent.noTint();
 }
@@ -159,6 +174,7 @@ if(fastestTimeYet!=999999999){
 		
 	
 	}
+	
 	
 	
 	  /*  

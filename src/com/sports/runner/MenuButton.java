@@ -60,7 +60,6 @@ public class MenuButton {
 		showY = y+parent.scrollY;
 		int showCol = bgCol;
 		
-		parent.parent.fill(bgCol);
 		if(pressed){
 			parent.parent.fill(bgColPressed);	
 			showCol=bgColPressed;
@@ -70,18 +69,11 @@ public class MenuButton {
 		
 		
 		
-		
-		try{
-		parent.parent.rect(x,showY,w,h,4);
-		}catch(Exception e){
-			parent.parent.rect(x,showY,w,h);	
-		}
-		
 		if(LOCKED > 0 ){
 			parent.parent.image(parent.parent.lockedImage,x+(w-h),showY+(h/12),h-(h/3),h-(h/6));
-			parent.parent.showButton(x,y,w,h,showCol,text,parent.parent.lockedImage);
+			parent.parent.showButton(x,showY,w,h,showCol,text,parent.parent.lockedImage);
 		}else
-			parent.parent.showButton(x,y,w,h,showCol,text);
+			parent.parent.showButton(x,showY,w,h,showCol,text);
 		/*
 		parent.parent.fill(0);
 		parent.parent.textAlign(parent.parent.LEFT,parent.parent.CENTER);

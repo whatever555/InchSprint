@@ -16,7 +16,7 @@ public class Player extends Athlete{
 
 		 public void moveMe(float moved){
 			 super.moveMe(moved);
-			 if(parent.hurdlesOn)
+			 if(parent.hurdlesOn && distanceTravelled<parent.track.trackWidth)
 				if((distanceTravelled)%(parent.track.ho)>parent.track.ho-parent.convertInchesToPixels((float)2) && 
 						(distanceTravelled)%(parent.track.ho)<parent.track.ho-parent.convertInchesToPixels((float).3)){
 					if(jumpY<parent.track.hurdleHeight/1.6 && jumping==false){
@@ -47,6 +47,7 @@ public class Player extends Athlete{
 		longEndTime = System.nanoTime();
 		myRaceTime=(float)((longEndTime-parent.longStartTime)/1000000000.0f);
 		
+		if(parent.training==false)
 		parent.verifyTime(parent.millis(),System.nanoTime());
 		System.gc();
 		parent.endRace(true);

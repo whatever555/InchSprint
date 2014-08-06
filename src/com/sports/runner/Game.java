@@ -72,7 +72,7 @@ public class Game extends PApplet{
 		showLoadingMessage();
     	
 		flashMessages=new ArrayList<String>();
-		pbs = new float[7];
+		pbs = new float[50];
 		for(int i = 0; i <pbs.length;i++){
 			pbs[i]=99999;
 		}
@@ -144,7 +144,6 @@ public class Game extends PApplet{
 		}else{
 		showLoadingMessage();	
 		}
-		rc.showHomeButton();
 	}
 	public void showLoadingMessage(){
 		image(bgImage,0,0,displayWidth,displayHeight);
@@ -152,9 +151,10 @@ public class Game extends PApplet{
 		textSize(26);
 		textAlign(CENTER,CENTER);
 		messageFont=createFont("fonts/messageFont.ttf", 34, true);
-		filter(BLUR,2);
+		imageMode(CENTER);
+		image(homeIcon,displayWidth/2,(int)(displayHeight/2.1-homeIcon.height));
 		text("Loading...",displayWidth/2,displayHeight/2);
-		
+		imageMode(CORNER);
 	}
 	public void showFlashMessages(){
 		if(race!=null)
@@ -172,18 +172,22 @@ public class Game extends PApplet{
 	
 	public void showFlashMessage(String str){
 		//println("showing message" +str);
-		fill(40);
-		noStroke();
-		rect(displayWidth/10,10,displayWidth-(displayWidth/5),38,3);
+		fill(0);
+		strokeWeight(0);
+		stroke(255,100);
+		rect(-1,-1,displayWidth+2,38);
 		textAlign(CENTER);
 		textFont(messageFont);
 		textSize(16);
 		fill(255);
 		text(str,displayWidth/2,28);
+		noStroke();
 	}
 	
-	public void showRaceScreen(int botCount,boolean hurdlesOn,int trackInInches,String raceMode,String ghostType,String practiceMode){
+	public void showRaceScreen(int botCount,boolean hurdlesOn,int trackInInches,String raceMode,String ghostType,String practiceMode,String raceAgainst,boolean longJumpOn){
 		noLoop();	
+		race.longJumpOn=longJumpOn;
+		race.raceAgainst=raceAgainst;
 			race.fastestTimeYet=999999999;
 			race.ghostType=ghostType;
 			race.practiceMode=practiceMode;
@@ -229,8 +233,9 @@ if(message.indexOf("0:00:00")<0){
 			                Context context = getApplicationContext();
 			                int duration = Toast.LENGTH_SHORT;
 
-			                Toast toast = Toast.makeText(context, message, duration);
+			               /* Toast toast = Toast.makeText(context, message, duration);
 			                toast.show();
+			                */
 }
 			                // Return true to tell Swarm you've consumed the event
 			                // and thus Swarm will not display the default toast.
@@ -346,13 +351,13 @@ if(message.indexOf("0:00:00")<0){
 		    	// This method is called when the login process has started
 		    	// (when a login dialog is displayed to the user).
 		    	public void loginStarted() {
+		    		
 		    		println("LOGIN STARTESD");
 		    		//getCloudVars();
 		    	}
 
 		    	// This method is called if the user cancels the login process.
 		    	public void loginCanceled() {
-
 		    		println("LOGIN CANCELLED");
 		    		getCloudVars();
 		    	}
@@ -372,18 +377,55 @@ if(message.indexOf("0:00:00")<0){
 
 		    };
 		    
-		    public void getCloudVars(){
+		    public void showPersonalRecord(String rec){
+		    	String recordName = rec+ " Inches PB";
+		    	int i=0;
+		    	if(rec.equals("Off")){
+		    		recordName = "Off the Blocks PB";
+		    		i=0;
+		    	}
+		    	else{
+		    		i=getRaceIndex(Integer.parseInt(rec), false);
+		    	}
 		    	
+						    
+		    	String[] dets;
+		    	String rec1="";
+		    	String rec2="";
+		    	if(i==0){
+		    		if(pbs[i]>0.0 && pbs[i]<99998)
+		    		rec1 = ""+pbs[i]+" Seconds";
+		    		else
+		    		rec1 = "No Record Set Yet";
+		    		
+		    		dets=new String[]{recordName,rec1,""};
+		    	}else{
+		    		if(pbs[i]>0.0 && pbs[i]<99998)
+		    			rec1 = ""+pbs[i]+" Seconds";
+		    		else
+		    		rec1 = "No Record Set Yet";
+		    		
+		    		if(pbs[i+24]>0.0 && pbs[i+24]<99998)
+		    			rec2 = ""+pbs[i+24]+" Seconds";
+		    		else
+		    		rec2 = "No Record Set Yet";
+		    		dets=new String[]{recordName,rec1,"",recordName+" (Hurdles)",rec2,""};
+		    	}
+		    	
+		    	showSingleMessagePop(dets,new MyCallback(){ 
+					  public void onMessageClose(){ 
+					  }
+				});
+		    }
+		    int totalVarCount;
+		    public void getCloudVars(){
+
+	    		showLoadingMessage();
 		    	setVarCount=0;
+		    	totalVarCount=3;
 	    		setFromCloud("Training Progress");
 	    		setFromCloud("Championship Progress");
-	    		setFromCloud("Personal Best 60 Inches");
-	    		setFromCloud("Personal Best 100 Inches");
-	    		setFromCloud("Personal Best 200 Inches");
-	    		setFromCloud("Personal Best 400 Inches");
-	    		setFromCloud("Personal Best 800 Inches");
-	    		setFromCloud("Personal Best 1500 Inches");
-	    		setFromCloud("Personal Best Off The Blocks");
+	    		setFromCloud("Personal Bests");
 		    }
 		    
 			public boolean surfaceTouchEvent(MotionEvent event) {
@@ -411,38 +453,27 @@ if(message.indexOf("0:00:00")<0){
 				  return super.surfaceTouchEvent(event);
 				}
 			
+			public void updatePersonalBests(int trackInInches,boolean hurdlesOn,float racetime){
+				int index=getRaceIndex(trackInInches,hurdlesOn);
+				if(racetime<pbs[index])
+				pbs[index]=racetime;
+			}
 			
+			public String convertPBSToString(){
+				String outStr="";
+				for(int i=0;i<pbs.length;i++){
+					outStr+=pbs[i];
+					if(i<pbs.length-1)
+						outStr+=",";
+				}
+				return outStr;
+			}
 			boolean paused=false;
 			public void saveToCloud(final String varName,final String newVal){
+				println("IN SAVING CUNTION");
+				
 				if (Swarm.isLoggedIn() && newVal!="0.0") {
-				paused=true;
-			    
-				GotCloudDataCB callback = new GotCloudDataCB() {
-				    public void gotData(String data) {
-
-				        // Did our request fail (network offline, and uncached)?
-				        if (data == null) {
-				        	paused=false;
-
-				    		println("DATANULL IN SAVE");
-					        updateLocalData(varName,newVal,"0");
-				            return;
-				        }
-
-				        // Has this key never been set?  Default it to a value...
-				        if (data.length() == 0) {
-				        
-				            // In this case, we're storing levelProgress, default them to level 1.
-				            data = "1";
-				        }
-
-				        updateLocalData(varName,newVal,data);
-				        paused=false;
-				    }
-				}; 
-				
-				
-				    Swarm.user.getCloudData(varName, callback);
+					Swarm.user.saveCloudData(varName, ""+newVal);
 				}
 				
 				
@@ -450,54 +481,6 @@ if(message.indexOf("0:00:00")<0){
 			}
 			
 			
-			public void updateLocalData(String varName, String newVal,String data){
-			    // Parse the level data for later use
-		        if(varName.equals("Training Progress")){
-		        	if(Integer.parseInt(data)<Integer.parseInt(newVal)){
-		        		Swarm.user.saveCloudData(varName, newVal);
-		        		trainingProgress=Integer.parseInt(newVal);
-		        	}
-		        	else
-		        		trainingProgress=Integer.parseInt(data);
-		        	
-		       
-		        	
-		        }else
-		        	 if(varName.equals("Championship Progress")){
-				        	if(Integer.parseInt(data)<Integer.parseInt(newVal)){
-				        		Swarm.user.saveCloudData(varName, newVal);
-				        		championshipProgress=Integer.parseInt(newVal);
-				        	}
-				        	else
-				        		championshipProgress=Integer.parseInt(data);
-		        	 }else
-		        	if(varName.equals("Personal Best Off The Blocks")){
-		        		if(data.equals("0"))
-		        			data="999";
-				   		if(Float.parseFloat(data)>Float.parseFloat(newVal)){
-			        		Swarm.user.saveCloudData(varName, newVal);
-			        		pbs[6]=Float.parseFloat(newVal);
-			        	}
-			        	else
-			        		pbs[6]=Float.parseFloat(data);
-				   		
-					        
-				   	 }else
-		        
-		        
-		   	 if(varName.indexOf("Personal Best")==0){
-		   		if(data.equals("0"))
-        			data="99999";
-		   		if(Float.parseFloat(data)>Float.parseFloat(newVal)){
-	        		Swarm.user.saveCloudData(varName, newVal);
-	        		pbs[getRaceIndex(Integer.parseInt(varName.split(" ")[2]))]=Float.parseFloat(newVal);
-	        	}
-	        	else
-	        		pbs[getRaceIndex(Integer.parseInt(varName.split(" ")[2]))]=Float.parseFloat(data);
-		   		
-			        
-		   	 }
-			}
 			
 			public void setFromCloud(final String varName){
 			
@@ -509,11 +492,13 @@ if(message.indexOf("0:00:00")<0){
 					        // Did our request fail (network offline, and uncached)?
 					        if (data == null) {
 
-					        	setVarCount++;
-							    	loadGame();
-							    
-					            // Handle failure case.
-						    	paused=false;
+					        	 setVarCount++;
+								    if(setVarCount==totalVarCount){
+								    	paused=false;
+								    	loadGame();
+								    }
+					           
+						    	
 					            return;
 					        }
 
@@ -529,29 +514,18 @@ if(message.indexOf("0:00:00")<0){
 					    	 if(varName.equals("Championship Progress"))
 						        	championshipProgress=Integer.parseInt(data);
 					    	 
-					        if(varName.indexOf("Personal Best")==0){
+					        if(varName.equals("Personal Bests")){
 					        	if(data.equals("0"))
-				        			data="9999";
+				        			data="";
 					        
-					        if(varName.equals("Personal Best 60 Inches"))
-					        	pbs[0]=Float.parseFloat(data);
-					        if(varName.equals("Personal Best 100 Inches"))
-					        	pbs[1]=Float.parseFloat(data);
-					        if(varName.equals("Personal Best 200 Inches"))
-					        	pbs[2]=Float.parseFloat(data);
-					        if(varName.equals("Personal Best 400 Inches"))
-					        	pbs[3]=Float.parseFloat(data);
-					        if(varName.equals("Personal Best 800 Inches"))
-					        	pbs[4]=Float.parseFloat(data);
-					        if(varName.equals("Personal Best 1500 Inches"))
-					        	pbs[5]=Float.parseFloat(data);
-					        if(varName.equals("Personal Best Off The Blocks"))
-					        	pbs[6]=Float.parseFloat(data);
+					        if(varName.equals("Personal Bests"))
+					        	localisePBS(data);
+					        
 					        }
 					        
 					        paused=false;
 					        setVarCount++;
-						    if(setVarCount>8){
+					        if(setVarCount==totalVarCount){
 						    	loadGame();
 						    }
 						    
@@ -564,6 +538,17 @@ if(message.indexOf("0:00:00")<0){
 					}
 			}
 			
+			public void localisePBS(String str){
+				println("LOCALISING BITCHES");
+				println(str);
+				String[] stra = str.split(",");
+				for(int i=0;i<stra.length;i++)
+					try{
+					pbs[i] =Float.parseFloat(stra[i]);
+					}catch(Exception e){
+						println("CAUGHT EXCEPTION FLOAT "+stra[i]);
+					}
+			}
 			
 			public void setupControlsMP(){
 				controlsMP=new MessagePop(this,"Controls",new MyCallback(){ 
@@ -663,24 +648,27 @@ if(message.indexOf("0:00:00")<0){
 				
 			}
 			
-			public int getRaceIndex(int i){
+			public int getRaceIndex(int i,boolean hurdlesOn){
+				int extra = 0;
+				if(hurdlesOn)
+					extra=24;
 				if(i==60)
-					return 0;
+					return 1+extra;
 				else
 				if(i==100)
-					return 1;
+					return 2+extra;
 				else
 					if(i==200)
-						return 2;
+						return 3+extra;
 					else
 						if(i==400)
-							return 3;
+							return 4+extra;
 						else
 							if(i==800)
-								return 4;
+								return 5+extra;
 							else
 								if(i==1500)
-									return 5;
+									return 6+extra;
 				return -1;
 			}
 			
@@ -700,7 +688,7 @@ if(message.indexOf("0:00:00")<0){
 			
 			public void displayButton(int x, int y, int w, int h,int tintCol,String text,PImage extraIcon){
 
-				if(tintCol>-1)
+				if(tintCol!=-1)
 					tint(tintCol);
 				
 				int sw=10;
@@ -708,17 +696,22 @@ if(message.indexOf("0:00:00")<0){
 				image(buttonGraphic,x+sw,y,w-(sw*2),h);
 				image(buttonRightGraphic,x+w-sw,y,sw,h);
 				
-				if(tintCol>-1)
+				if(tintCol!=-1)
 					noTint();
 				
 				if(text!=null){
+					fill(0);
 					textAlign(LEFT,CENTER);
-					text(text,x+sw,y+h/2);
+					text(text,x+sw-1,y+h/2-1);
+
+					fill(255);
+					textAlign(LEFT,CENTER);
+					text(text,x+sw+1,y+h/2+1);
 				}
 				
 				if(extraIcon!=null){
 					imageMode(CENTER);
-					image(extraIcon,x+w-sw-(h/2),y+(h/2),h,h);
+					image(extraIcon,x+w-sw-(h/2),y+(h/2),(int)(h*.8),(int)(h*.8));
 					imageMode(CORNER);
 				}
 				

@@ -12,12 +12,17 @@ import com.swarmconnect.SwarmAchievement;
 import com.swarmconnect.SwarmLeaderboard;
 public class RaceClass extends Screen {
 
-	
+	boolean verified=false;
 	Game parent;
 	PImage shadow;
+	boolean clickSetAllow=false;
+	boolean clickSet=false;
 	
+	String raceAgainst = "session";
 	float shadowWidth;
 
+	boolean longJumpOn=false;
+	
 	boolean raceCancelled=false;
 	boolean jumpingEnabled=false;
 	
@@ -120,6 +125,9 @@ public class RaceClass extends Screen {
 			if(practiceMode.equals("Hurdles")){
 				trackInInches=100;
 			}
+			if(practiceMode.equals("Long Jump")){
+				trackInInches=100;
+			}
 			shadowWidth = parent.random(1);
 			track=new Track(this,trackInInches,1,hurdlesOn);
 			displayMessageBool=true;
@@ -131,6 +139,9 @@ public class RaceClass extends Screen {
 		}
 		
 		public void setMeUp(){
+			clickSetAllow=false;
+			clickSet=false;
+			verified=false;
 track.reset();
 			raceCancelled=false;
 			falseStartCount=0;
@@ -244,10 +255,14 @@ System.gc();
 			
 			if(leaderboardID!=-1){
 			SwarmLeaderboard.submitScore(leaderboardID, (float)(racetime));
-			if(parent.getRaceIndex(trackInInches)>-1)
-    		if(racetime<(parent.pbs[(parent.getRaceIndex(trackInInches))])){
-    			parent.saveToCloud("Personal Best "+trackInInches+" Inches", ""+racetime);
-    			parent.flashMessages.add("New Personal Best Time!");
+			parent.println("RACETIME: "+racetime+" PBID "+parent.getRaceIndex(trackInInches,hurdlesOn)+" currentPB "+parent.pbs[(parent.getRaceIndex(trackInInches,hurdlesOn))]);
+			if(parent.getRaceIndex(trackInInches,hurdlesOn)>-1)
+    		if(racetime<(parent.pbs[(parent.getRaceIndex(trackInInches,hurdlesOn))])){
+    			parent.updatePersonalBests(trackInInches,hurdlesOn,racetime);
+
+    			parent.println("SAVING TO CLOUD 2");
+    			parent.saveToCloud("Personal Bests", parent.convertPBSToString());
+    			parent.flashMessages.add("New PB!");
     		}
 			}
 			}
@@ -256,11 +271,14 @@ System.gc();
 		
 		public void submitReactionTime(){
 			if(!training){
-			if(reactionSpeed<1 && reactionSpeed>0 && raceCancelled==false){
-				if(reactionSpeed<parent.pbs[6]){
+			if(reactionSpeed<99 && reactionSpeed>0 && raceCancelled==false){
+				
 			SwarmLeaderboard.submitScore(17101,reactionSpeed);
-			parent.saveToCloud("Personal Best Off The Blocks", ""+reactionSpeed);
-			parent.flashMessages.add("New Personal Best Reaction Speed!");
+			if(reactionSpeed<parent.pbs[0]){
+			parent.pbs[0]=reactionSpeed;
+			parent.println("SAVING TO CLOUD");
+			parent.saveToCloud("Personal Bests",parent.convertPBSToString());
+			parent.flashMessages.add("New Reaction Speed PB!");
 				}
 			
 			}
@@ -305,10 +323,12 @@ System.gc();
 				moveY=player.atEaseSpeed;
 				updatePositions();
 				lastMillis=parent.millis();
+				if(verified==false)
 				raceStage=6;
 				if(training)
 					raceStage=7;
 				floatWaitTime = parent.millis();
+				
 			}
 			if(raceStage==6 || raceStage == 7){
 				parent.textAlign(parent.CENTER,parent.CENTER);
@@ -318,9 +338,9 @@ System.gc();
 				parent.fill(0,190);
 				parent.rect(0,0,parent.displayWidth,parent.displayHeight,3);
 				parent.fill(255);
-				if(!training)
+				if(!training==true){
 				parent.text("Race time: "+player.myRaceTime,parent.displayWidth/2,(parent.displayHeight/2)-40);
-				else{
+				}else{
 					if(practiceMode.equals("Starts")){
 						if(reactionSpeed!=999999999){
 						parent.text("Reaction Speed:",parent.displayWidth/2,(parent.displayHeight/2)-40);
@@ -394,17 +414,22 @@ System.gc();
 					parent.fill(255);
 					parent.text("Tap Screen to Try Again",parent.displayWidth/2,(parent.displayHeight/2)+80);
 					
-					if(parent.mousePressed){
-						setMeUp();
-					}
+					
+					clickSetAllow=true;
+					
 				
 				}else{
 					parent.fill(255);
 					if(!training)
 					parent.text("Verifying Time",parent.displayWidth/2,(parent.displayHeight/2)+40);
 				}
-				if(!training)
+				if(!training){
+					if(raceMode.equals("Time Trial") && botCount>0 && player.myRaceTime < fastestTimeYet )
+						playerPosition=1;
+					else if(raceMode.equals("Time Trial") && botCount>0)
+						playerPosition=2;
 				parent.text("Position: "+playerPosition,parent.displayWidth/2,(parent.displayHeight/2)+120);
+				}
 				
 			}
 			
@@ -417,61 +442,63 @@ System.gc();
 		boolean jumpLoading=false;
 		
 		public void mousePressed(){
+			if(raceStage == 7  && clickSetAllow==true){
+				clickSet=true;
+			}
+			
 			if(!startMeasured){
 				if(!raceOn && raceCancelled==false){
 					raceCancelled=true;
 					reactionSpeed=999999999;
 					soundShotBeginRace(true);
-					if(!training){
+					if(!training==true){
 						falseStarts++;
 						parent.showSingleMessagePop(new String[]{"False Start!","",falseStarts+"/"+maxFalseStarts+" False starts","","Tap Screen to Restart",""},new MyCallback(){ 
 							  public void onMessageClose(){ 
 								  setMeUp();
 							  }
 						});
+					}else if(practiceMode.equals("Starts")){
+
+						soundShotBeginRace(true);
+						restartStartsTraining();
 					}
 
 					//todo//soundShotBeginRace(true);
 				}
 				else{
 					reactionSpeed = ((System.nanoTime()-longStartTime)/1000000000.0f);
+					if(practiceMode.equals("Starts")){
 					if(reactionSpeed<.3f){
-						if(training){
+						
 						//SwarmAchievement.unlock(21413);
 						if(parent.trainingProgress<2){
 							parent.trainingProgress=2;
-							parent.showSingleMessagePop(new String[]{"Content Unlocked!","Hurdle Practice now available"},new MyCallback(){ 
+							parent.showSingleMessagePop(new String[]{"Content Unlocked!","Hurdle Practice now available"},
+									new MyCallback(){ 
 								  public void onMessageClose(){ 
-									  endRace(false);
+
+										restartStartsTraining();
 								  }
 							});
-
+									
+							startMeasured=true;
 							parent.saveToCloud("Training Progress", "2");
+						}else{
+							startMeasured=true;
+							restartStartsTraining();
 						}
 						
+						}else{
+							startMeasured=true;
+							restartStartsTraining();
 						}
-						
-						
-						parent.showSingleMessagePop(new String[]{"Tap Here to Advance","Next Stage: Hurdles Practice"},
-								new MyCallback(){ 
-							  public void onMessageClose(){ 
-								  if(parent.mouseY>parent.activeMP.y){
-								  practiceMode ="Hurdles";
-									parent.showRaceScreen(0,true,70,"Training","No Ghost","Hurdles");
-								  }else{
-									  setMeUp();
-								  }
-							  }
-						},2,2);
+
 					}
 				}
 				
 				startMeasured=true;
-				if(training){
-					if(practiceMode.equals("Starts"))
-						restartStartsTraining();
-					
-				}
+				
 			}
 			
 			if(raceOn){
@@ -511,6 +538,11 @@ System.gc();
 		
 		
 		public void mouseReleased(){
+			if(raceStage == 7 && clickSet==true && clickSetAllow==true){
+				clickSet=false;
+				parent.println("NOW I AM IN HERE ");
+				setMeUp();
+			}
 			if(dragging==true){
 			
 			dragging=false;
@@ -595,7 +627,7 @@ System.gc();
 					  public void onMessageClose(){ 
 						  if(parent.mouseY>parent.activeMP.y){
 						  practiceMode ="Starts";
-							parent.showRaceScreen(0,false,5,"Training","No Ghost","Starts");
+							parent.showRaceScreen(0,false,5,"Training","No Ghost","Starts","session");
 						  }else{
 							  setMeUp();
 						  }
@@ -612,11 +644,26 @@ System.gc();
 				}
 				}
 			}
+			if(practiceMode.equals("Starts")){
+				if(reactionSpeed<.3)
+				parent.showSingleMessagePop(new String[]{"Tap Here to Advance","Next Stage: Hurdles Practice"},
+						new MyCallback(){ 
+					  public void onMessageClose(){ 
+						  if(parent.mouseY>parent.activeMP.y){
+							  //todo check if this is always called 
+						  practiceMode ="Hurdles";
+							parent.showRaceScreen(0,true,70,"Training","No Ghost","Hurdles","session");
+						  }else{
+							 // setMeUp();
+						  }
+					  }
+				},2,2);
+			}
 			
 		}
 		
 		public void startRace(){
-			
+			verified=false;
 			Thread t = new Thread() {
 			public void run() {
 				String[] temp = parent.loadStrings("http://imaga.me/now.php?"+parent.random(999999));
@@ -693,7 +740,10 @@ System.gc();
 				public void run() {
 					
 					try {
-						Thread.sleep(2000);
+						floatWaitTime=parent.millis(); 
+						Thread.sleep(1000);
+
+						floatWaitTime=parent.millis(); 
 						if(raceStage==99){
 							//submitReactionTime();
 							player.finished=true;
@@ -754,7 +804,7 @@ System.gc();
 				raceOn=true;
 				raceStage=99;
 			}
-			if(!falseStart && (raceStage == 99)){
+			if(!falseStart && (raceStage > 5)){
 				 parent.v.vibrate(100);
 				gameSounds.playSound("gshot1");
 			
@@ -780,27 +830,35 @@ System.gc();
 		
 		
 		public void verifyTime(final float floatEnd, final long longEnd){
-			
+			parent.println("VERIFY TIME");
 			Thread t = new Thread() {
 			    public void run() {
-			    
+			    	parent.println("VERIFY TIME RUNNING");
 			    	float f = parent.millis();
+			    	parent.println("VERIFY CHECKING LIVE SITE");
 			    	String[] temp = parent.loadStrings("http://imaga.me/now.php?"+parent.random(999999));
-					
+			    	parent.println("VERIFY GOT LIVE SITE DATA");
 			    	long serverRaceTime=-1;
 					
 			    	if(temp!=null)
 			    		{
+			    		parent.println("VERIFY WASNT NULL");
 							try {
+								parent.println("VERIFY TRYGING SOME MWAHT");
 								serverRaceTime = (long) ((Long.parseLong(temp[0])-serverStartTime)-(parent.millis()-f));
 							}
 						catch(Exception e){
+							parent.println("VERIFY CATCHING THE EXCEPTOPNM");
 							serverRaceTime=-1;
 						}
 						
+					}else{
+						parent.flashMessages.add("Could not submit score");
+						parent.flashMessages.add("No Internet Connection");
 					}
 					
 					if(serverRaceTime!=-1){
+						parent.println("VERIFY SERVERTIME WAS OK");
 						float longRaceTime = (float)((longEnd - longStartTime)/1000000000.0f);
 						float floatRaceTime = floatEnd-floatStartTime;
 						
@@ -809,12 +867,16 @@ System.gc();
 
 						
 						
-						if(training){
+						if(!training){
 						submitScore(longRaceTime);
 						submitReactionTime();
 						}
+						parent.println("is it? aye");
 						if(longRaceTime<fastestTimeYet || fastestTimeYet==999999999){
+							parent.println("fuckin aye");
+							//todo::this way is elegant but maybe not supportive of future changes
 							fastestTimeYet=longRaceTime;
+							track.knockedHurdlesTT=track.knockedHurdles;
 						}
 						
 					}else{
@@ -822,8 +884,9 @@ System.gc();
 					}
 					
 					
-					
+					parent.println("VERIFY GONNA CHANGE RACE STAGE");
 					raceStage=7;
+					verified=true;
 					}
 			    
 			};

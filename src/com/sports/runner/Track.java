@@ -27,6 +27,7 @@ int trackY;
 int trackX;
 
 String knockedHurdles="";
+String knockedHurdlesTT="";
 int trackDisplayWidth;
 int trackDisplayHeight;
 boolean hurdlesOn =false;
@@ -230,6 +231,8 @@ float barSize;
 	 
 	 if(lastYY!=-1){
 	for(int i=1;i<=hurdleCount;i++){
+
+		parent.parent.stroke(240,255);
 		 float hurdleX = (ho*i);
 		 float hurdleDispX = (hurdleX/XDIV-(parent.player.distanceTravelled/XDIV) );
 		 float offX = (float)(hurdleDispX/2.8);
@@ -242,7 +245,7 @@ float barSize;
 	float compareVar = (yy-(float)trackHeight/(float)divAmt);
 		float hh1 = (float) (((float)hurdleHeight/barSize)*(compareVar+(barSize-compareVar)/3.5));
 	
-		 float newX = nearX+((offX/barSize)*(yy-trackHeight/divAmt))+4;
+		 float newX = nearX+((offX/barSize)*(yy-trackHeight/divAmt));
 		 
 		 float ke=0;//for knocked hurdles
 		 if(knockedHurdles.indexOf("("+i+"-"+hurdleID+")")>-1){
@@ -253,7 +256,7 @@ float barSize;
 	
 		 compareVar = (lastYY-(float)trackHeight/(float)divAmt);
 		 float hh2 = (float) (((float)hurdleHeight/barSize)*(compareVar+(barSize-compareVar)/3.5));
-		 float newX2 = nearX+((offX/barSize)*(lastYY-trackHeight/divAmt))+4;
+		 float newX2 = nearX+((offX/barSize)*(lastYY-trackHeight/divAmt));
 		 
 		 
 		 //upright
@@ -266,7 +269,7 @@ float barSize;
 		 parent.parent.line(newX+2+ke,yy-hh1+ke,newX2-2+ke,lastYY-2-hh2+ke);
 
 			parent.parent.strokeWeight(2);
-			parent.parent.stroke(255,200);
+			parent.parent.stroke(200,100);
 		 parent.parent.line(newX+2+ke,yy-(hh1/2)+ke,newX2-2+ke,lastYY-2-(hh2/2)+ke);
 		 }
 		} 
@@ -288,16 +291,17 @@ public void drawTrackVertiLines(){
 	  
 	 for(int i=0;i<lineCount;i++){
 	 
-	 float lineX = (lo*i)+parent.player.XOFF;
+	 float lineX = (lo*i);
 	 float lineDispX = (lineX/XDIV-(parent.player.distanceTravelled/XDIV) );
 	 float offX = (float)(lineDispX/2.8);
 	 float nearX = lineDispX-offX;
 	 
 	if(nearX<dw+parent.player.XOFF+20 && lineDispX+parent.player.XOFF>-20){
 		parent.parent.strokeWeight(8);
-	 parent.parent.stroke(255,200);
-	 parent.parent.line(nearX,(float)trackHeight/(float)divAmt,lineDispX,trackHeight);
-	 parent.parent.line(lineDispX,trackHeight,lineDispX,trackHeight+trackHeight/9);
+	 parent.parent.stroke(255,120);
+	 float newX = nearX+((offX/barSize)*(trackHeight-trackHeight/divAmt));
+	 parent.parent.line(nearX,(float)trackHeight/(float)divAmt,newX,trackHeight);
+	 parent.parent.line(newX,trackHeight,newX,trackHeight+trackHeight/9);
 	 
 	}
 	 }
