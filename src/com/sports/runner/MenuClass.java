@@ -216,10 +216,11 @@ public void showPersonalBestOptions(){
 	public void beginAct(){
 		menuHeading="Main Menu";
 		
+		
 		practiceMode = "OFF";
 		ghostType="No Ghost";
 		botCount=1;
-		hurdlesOn=false;raceLength=100;
+		hurdlesOn=false;raceLength=100;longJumpOn=false;
 		raceMode="Race";ghostType="No Ghost Runner";practiceMode="OFF";
 		
 		buttons=new ArrayList<MenuButton>();
@@ -234,7 +235,7 @@ public void showPersonalBestOptions(){
 			buttons.add(new MenuButton(this,"Time Trial",2,1,"Requires completion of basic training"));
 		}
 			buttons.add(new MenuButton(this,"Leaderboards",3,-1));
-		if(parent.trainingProgress>2){
+		if(parent.trainingProgress>3){
 			buttons.add(new MenuButton(this,"Championship",4,-1));
 		}else{
 			buttons.add(new MenuButton(this,"Championship",4,1,"You must complete training to play"));
@@ -341,7 +342,7 @@ int bY=0;
 			}else
 			
 				if(buttons.get(i).text.equals("Quick Race")){
-					parent.showRaceScreen(12,false,60,"Race","No Ghost",practiceMode,"session");
+					parent.showRaceScreen(12,false,60,"Race","No Ghost",practiceMode,"session",false);
 				}else
 					if(buttons.get(i).text.equals("Account")){
 						showSwarmDashBoard();
@@ -408,9 +409,10 @@ int bY=0;
 						raceLength=70;
 						hurdlesOn=true;
 					}else 
-						if(str[1].equals("Long Jump")){
+						if(str[1].equals("Long")){
 						raceLength=100;
 						longJumpOn=true;
+						str[1]="Long Jump";
 					}
 					else
 						raceLength=5;

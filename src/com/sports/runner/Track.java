@@ -19,8 +19,9 @@ float XDIV=5;
 float interfaceWidth=100;
 float interfaceHeight=100;
 
-float ho;
-float lo;
+float ho;//hurdle
+float lo;//lines
+float jo;//longjump
 
 int skyColour = Color.rgb(200,200,255);
 int trackY;
@@ -45,14 +46,16 @@ int hurdDistributionSize;
 int lineDistributionSize;
 
 
-
+float playerFat;
 float topY;
 float bottomY;
 float barSize;
 
 
  public Track(RaceClass parent,int distance,int trackType,boolean hurdlesOn){
-	 hurdDistributionSize=25;
+	 
+	 
+	 hurdDistributionSize=21;
 	 lineDistributionSize=25;
 	 m = (float)1.5;//sumthin to do with hurdles
 	 int rand = (int)parent.random(200);
@@ -62,6 +65,7 @@ float barSize;
 	 skyColour = Color.rgb(200-rand,200-rand,255-rand);
 	this.hurdlesOn=hurdlesOn;
 	 this.parent=parent;
+	 playerFat=parent.player.mw;//width of player sprite
 	 dw = parent.parent.displayWidth;
 	 this.distance=distance;
 	 trackImage=parent.loadImage("images/tracks/"+trackType+".jpg");
@@ -90,6 +94,10 @@ float barSize;
 	 parent.parent.println("HURDLE COUNT: "+hurdleCount +" TRACKWIDTH: "+trackWidth+" ");
 	 ho = parent.convertInchesToPixels(hurdDistributionSize);
 	 lo = parent.convertInchesToPixels(hurdDistributionSize);
+	 jo = parent.convertInchesToPixels(20);
+	 
+	 if(parent.longJumpOn)
+		 lo = parent.convertInchesToPixels(hurdDistributionSize*2);
 	 
 	 topY=(trackHeight/divAmt)-hurdleHeight;
 	 bottomY=trackHeight-hurdleHeight;
@@ -196,10 +204,9 @@ float barSize;
 		
 	 }
 	 
-	 if(hurdlesOn){
-		// drawHurdles();
-		// parent.parent.line((int)(dw*m-offsetX)+30,trackHeight-(trackHeight/9)-(hurdleHeight),(int)(dw*m-offsetX)+30,trackHeight+(trackHeight/9));
-			
+	 if(parent.longJumpOn){
+		
+		 drawLongJumpSandPit();
 	}
 		
 	 parent.parent.noStroke();
@@ -236,9 +243,9 @@ float barSize;
 		 float hurdleX = (ho*i);
 		 float hurdleDispX = (hurdleX/XDIV-(parent.player.distanceTravelled/XDIV) );
 		 float offX = (float)(hurdleDispX/2.8);
-		 float nearX = hurdleDispX-offX;
+		 float nearX = hurdleDispX-offX+playerFat+parent.player.XOFF;
 		 
-		if(nearX<dw+parent.player.XOFF+20 && hurdleDispX+parent.player.XOFF>-20){
+		if(nearX<dw+20 && nearX>-20){
 		 
 		 
 	parent.parent.strokeWeight(3);
@@ -294,9 +301,9 @@ public void drawTrackVertiLines(){
 	 float lineX = (lo*i);
 	 float lineDispX = (lineX/XDIV-(parent.player.distanceTravelled/XDIV) );
 	 float offX = (float)(lineDispX/2.8);
-	 float nearX = lineDispX-offX;
+	 float nearX = lineDispX-offX+playerFat+parent.player.XOFF;
 	 
-	if(nearX<dw+parent.player.XOFF+20 && lineDispX+parent.player.XOFF>-20){
+	if(nearX<dw+20 && nearX>-20){
 		parent.parent.strokeWeight(8);
 	 parent.parent.stroke(255,120);
 	 float newX = nearX+((offX/barSize)*(trackHeight-trackHeight/divAmt));
@@ -307,8 +314,51 @@ public void drawTrackVertiLines(){
 	 }
 }
 
-
 public void drawFinishLine(){
 	
+}
+public void drawLongJumpSandPit(){
+	 
+	 float lineX = (jo);
+	 float lineDispX = (lineX/XDIV-(parent.player.distanceTravelled/XDIV) );
+	 float offX = (float)(lineDispX/2.8);
+	 float nearX = lineDispX-offX+parent.player.XOFF;
+	 
+	if(nearX<dw+20 && nearX+1300>-20){
+		
+		parent.parent.strokeWeight(6);
+	 parent.parent.stroke(255,230);
+	 
+	 float newX = nearX+((offX/barSize)*((trackHeight-trackHeight/4))-trackHeight/divAmt);
+	 parent.parent.image(parent.parent.sandGraphic,nearX+60,(trackHeight-trackHeight/4)+2,nearX+1300,trackHeight/4-4);
+	// parent.parent.line(newX,trackHeight,newX,trackHeight+trackHeight/9);
+	 
+	 parent.parent.line(nearX,(trackHeight-trackHeight/4)+2,nearX,((trackHeight-trackHeight/4)+2)+trackHeight/4-4);
+	
+	 parent.parent.rect(nearX+100,(trackHeight-trackHeight/4-12)-2,nearX+500,12);
+
+	 parent.parent.textSize(10);
+	 parent.parent.textAlign(parent.parent.LEFT,parent.parent.CENTER);
+	 
+	 for(int i=5;i<12;i++)
+	 parent.parent.text(i, jo+(parent.convertInchesToPixels(i)), ((trackHeight-trackHeight/4-12)-2)+12/2);
+	 
+	/*
+	
+	 parent.parent.strokeWeight(2);
+	 //parent.parent.rect(nearX, trackHeight-(trackHeight/4),nearX+100,(trackHeight/4));
+	 
+	 parent.parent.noStroke();
+	 parent.parent.beginShape();
+	 parent.parent.texture(parent.parent.sandGraphic);
+
+	 parent.parent.vertex(newX+300, trackHeight);//+300
+	 parent.parent.vertex(newX, trackHeight);
+ 	 parent.parent.vertex(nearX, trackHeight-(trackHeight/4));
+	 parent.parent.vertex(nearX+300, trackHeight-(trackHeight/4));
+	 
+	 parent.parent.endShape();
+	 */
+	}
 }
 }

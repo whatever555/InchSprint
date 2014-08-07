@@ -11,19 +11,21 @@ public class Bot extends Athlete{
 	
 	public void moveMe(float moved){
 		super.moveMe(moved);
-		if(parent.track.hurdlesOn){
-			if(jumping==false && finished==false){
+		if(parent.track.hurdlesOn &&jumpY<=0){
+			if(jumping==false && finished==false && distanceTravelled>parent.track.ho/2){
 				String entry = "("+((int)((distanceTravelled+parent.convertInchesToPixels(3))/parent.track.ho))+"-"+track+")";
 				if(parent.track.knockedHurdles.indexOf(entry)==-1)
-				if((distanceTravelled)%(parent.track.ho)>parent.track.ho-parent.convertInchesToPixels((float)3)){
+				if((distanceTravelled)%(parent.track.ho)>parent.track.ho-parent.convertInchesToPixels((float)1)){
 				jumping=true;
 					jumpingTargetHeight=(parent.track.hurdleHeight/2)+(parent.parent.random((float) (parent.track.hurdleHeight*2.5)));
-					
+					jumpingVelocity=jumpingTargetHeight;
 					if(ghost==true){
 						String e2="("+((int)((distanceTravelled+parent.convertInchesToPixels(3))/parent.track.ho))+"-1)";
 						
 						if(parent.track.knockedHurdlesTT.indexOf(e2)>-1){
 							jumpingTargetHeight=parent.track.hurdleHeight-5;
+							jumpingVelocity=jumpingTargetHeight;
+							
 							System.out.println("FOUND IN THER: "+e2);
 						}else{
 							jumpingTargetHeight=parent.track.hurdleHeight;

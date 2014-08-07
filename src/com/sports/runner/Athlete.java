@@ -1,11 +1,14 @@
 package com.sports.runner;
 
+import java.util.ArrayList;
+
 import android.graphics.Color;
-import processing.core.PImage;
 
 public class Athlete {
 	
-	
+	ArrayList<Float> last3Speeds;
+	float jumpingVelocity=0;
+	float longJumpLength=0;
 	RaceClass parent;
 	int track;
 	boolean bot;
@@ -74,6 +77,16 @@ int hurdlesHit=0;
 	int mh=(int) (sph/div);
 	int mw=(int) (spw/div);
 	public void reset(){
+		jumpingVelocity=0;
+		longJumpLength=0;
+		last3Speeds=new ArrayList<Float>();
+		int lastHowMany = 10;
+		if(parent.longJumpOn)
+			lastHowMany=20;
+		for(int i=0;i<lastHowMany;i++){
+		last3Speeds.add((float) 0.0);
+		}
+		
 		hurdlesHit=0;
 		div = (float)1.7+((float)(track)/(float)8);
 		mh = (int)((float)sph/div);
@@ -99,10 +112,28 @@ int hurdlesHit=0;
 	
 	public void moveMe(float moved){
 		
+		if(jumpingVelocity<=0){
+			jumpY=0;
+			jumping=false;
+		}else{
+			jumpingVelocity-=3;
+		}
+		
+		
+		if(jumpY>0 && track==1){
+			moved=jumpingVelocity;
+			parent.parent.println("VELOCITY: "+jumpingVelocity);
+		}
+		
+		
 		if(hurdleLag>0){
 			moved-=parent.parent.min(hurdleLag,moved);
 			hurdleLag-=4;
 		}
+		
+		last3Speeds.remove(0);
+		last3Speeds.add(moved);
+		
 		x+=moved/20;
 		distanceTravelled+=moved;
 		
@@ -133,9 +164,11 @@ int hurdlesHit=0;
 		if(jumpY<jumpingTargetHeight-1 && jumping==true){
 			jumpY+=(jumpingTargetHeight/3);
 		}else{
-			
-			if(jumpY>20){
-				jumpY-=(jumpY/3);
+			int jumpLandInt=14;
+			if(parent.longJumpOn)
+			jumpLandInt=3;
+			if(jumpY>jumpLandInt){
+				jumpY-=(jumpY/2);
 			}else{
 				
 				jumpY=0;	
@@ -253,6 +286,8 @@ public void drawReadyPosition(){
 		    parent.parent.image(parent.shoeSprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
 		    parent.parent.tint(tshirtCol,alpha);
 		    parent.parent.image(parent.outlineSprites[(int)x][y],myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh); 
+		    parent.parent.rect(myX, myY-parent.parent.min(jumpY,parent.track.hurdleHeight+5),mw,mh/5); 
+		    
 		}
 	    
 	     

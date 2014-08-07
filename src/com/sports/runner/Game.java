@@ -27,6 +27,7 @@ public class Game extends PApplet{
 	
 	Vibrator v; // Vibrate for 500 milliseconds
 
+	PImage sandGraphic;
 	PImage buttonGraphic;
 	PImage buttonLeftGraphic;
 	PImage buttonRightGraphic;
@@ -65,10 +66,11 @@ public class Game extends PApplet{
 	public void setup(){
 		homeIcon=loadImage("graphics/home.png");
 		buttonGraphic=loadImage("graphics/button.png");
+		sandGraphic=loadImage("graphics/sand.jpg");
 		buttonLeftGraphic=loadImage("graphics/buttonLeft.png");
 		buttonRightGraphic=loadImage("graphics/buttonRight.png");
 		bgImage = loadImage("images/back.jpg");
-		size(displayWidth,displayHeight,P2D);
+		
 		showLoadingMessage();
     	
 		flashMessages=new ArrayList<String>();
@@ -97,6 +99,8 @@ public class Game extends PApplet{
 		loadSwarm();
 		rc=new RaceSummary(this);
 	}
+	
+
 	
 	public void showMessage(String message){
 		if(message.equals("controls")){
@@ -438,7 +442,7 @@ if(message.indexOf("0:00:00")<0){
 					  race.jumpLoading=true;
 				  }
 				  if(TouchEvents<2&&race.jumpLoading==true&&race.raceOn==true){
-					  if(race.jumpLoading && race.hurdlesOn==true){
+					  if(race.jumpLoading && (race.hurdlesOn==true || race.longJumpOn==true)){
 						  race.moveY+=(race.getLastY(mouseY)-race.lastY);
 							
 							
@@ -446,6 +450,16 @@ if(message.indexOf("0:00:00")<0){
 							race.player.jumping=true;
 							race.jumpLoading=false;
 							race.player.jumpingTargetHeight = (float) (race.track.hurdleHeight*1.5);
+							float avgSpeed = 0;
+							for(int i=0;i<race.player.last3Speeds.size();i++){
+								avgSpeed+=race.player.last3Speeds.get(i);
+							}
+							avgSpeed=avgSpeed/race.player.last3Speeds.size();
+							
+							if( race.longJumpOn==true)
+								avgSpeed+=(race.moveY)+race.player.last3Speeds.get(race.player.last3Speeds.size()-1)+race.player.last3Speeds.get(race.player.last3Speeds.size()-2);
+							
+								race.player.jumpingVelocity=avgSpeed;
 							
 						}
 				  }

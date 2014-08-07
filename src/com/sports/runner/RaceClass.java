@@ -288,6 +288,8 @@ System.gc();
 		
 		public void drawMe(){
 
+			
+			
 			if(raceStage == 3){
 			//	if(millis()-lastMillis>=1000){
 					
@@ -406,6 +408,31 @@ System.gc();
 						}
 					
 					}
+					
+					if(practiceMode.equals("Long Jump")){
+						if(player.longJumpLength<=50){
+							
+							if(r==0){
+							parent.text("Nope!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+							parent.text("Remember to gain mometum before jumping",parent.displayWidth/2,(parent.displayHeight/2));
+							}else
+							if(r==1){
+								parent.text("Close!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+								parent.text("Don't jump too soon.",parent.displayWidth/2,(parent.displayHeight/2));
+								
+							}else
+							if(r==2){
+								parent.text("Getting Better!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+								parent.text("Drag fast before releasing to jump further",parent.displayWidth/2,(parent.displayHeight/2));
+							}else
+								if(r==3){
+									parent.text("Nope!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+									parent.text("Run faster for longer jumps",parent.displayWidth/2,(parent.displayHeight/2));
+								}
+						}
+					
+					}
+					
 				}
 				
 				if(raceStage == 7 && parent.millis() - floatWaitTime > 2500){
@@ -428,7 +455,11 @@ System.gc();
 						playerPosition=1;
 					else if(raceMode.equals("Time Trial") && botCount>0)
 						playerPosition=2;
+					if(!longJumpOn)
 				parent.text("Position: "+playerPosition,parent.displayWidth/2,(parent.displayHeight/2)+120);
+				}
+				if(longJumpOn){
+					parent.text("Jump Length: "+convertPixelsToInches(player.longJumpLength)+ " inches",parent.displayWidth/2,(parent.displayHeight/2)+120);
 				}
 				
 			}
@@ -627,12 +658,34 @@ System.gc();
 					  public void onMessageClose(){ 
 						  if(parent.mouseY>parent.activeMP.y){
 						  practiceMode ="Starts";
-							parent.showRaceScreen(0,false,5,"Training","No Ghost","Starts","session");
+							parent.showRaceScreen(0,false,5,"Training","No Ghost","Starts","session",false);
 						  }else{
 							  setMeUp();
 						  }
 					  }
 				},2,2);
+			}
+			
+			if(practiceMode.equals("Long Jump")){
+				if(parent.trainingProgress<4 && player.longJumpLength>500){
+					parent.showSingleMessagePop(new String[]{"Content Unlocked!","Championship mode now available"},null);
+					parent.trainingProgress=4;
+					parent.saveToCloud("Training Progress", "4");
+				
+					
+				}
+				if(parent.trainingProgress>3){
+				parent.showSingleMessagePop(new String[]{"Tap here to open menu"},
+						new MyCallback(){ 
+					  public void onMessageClose(){ 
+						  if(parent.mouseY>parent.activeMP.y){
+						  parent.showMainMenuScreen();
+						  }else{
+							 // setMeUp();
+						  }
+					  }
+				},2,2);
+			}
 			}
 			
 			if(practiceMode.equals("Hurdles") ){
@@ -652,7 +705,7 @@ System.gc();
 						  if(parent.mouseY>parent.activeMP.y){
 							  //todo check if this is always called 
 						  practiceMode ="Hurdles";
-							parent.showRaceScreen(0,true,70,"Training","No Ghost","Hurdles","session");
+							parent.showRaceScreen(0,true,70,"Training","No Ghost","Hurdles","session",false);
 						  }else{
 							 // setMeUp();
 						  }
@@ -684,6 +737,8 @@ System.gc();
 					beginHurdleTraining();
 					else if(practiceMode.equals("Starts"))
 					beginStartsTraining();
+					else if(practiceMode.equals("Long Jump"))
+					beginLongJumpTraining();
 					else
 					saySet(0);
 				}
@@ -711,6 +766,19 @@ System.gc();
 		public void beginHurdleTraining(){
 			if(displayMessageBool){
 			parent.showSingleMessagePop(new String[]{"How To Jump","Drag two fingers on the track at the same time",""," a) Run the length of the track"," b) Don't knock any hurdles"},new MyCallback(){ 
+				  public void onMessageClose(){ 
+					  soundShotBeginRace(true);
+				  }
+			});
+			}else{
+				soundShotBeginRace(true);
+			}
+		}
+		
+
+		public void beginLongJumpTraining(){
+			if(displayMessageBool){
+			parent.showSingleMessagePop(new String[]{"Long Jump","Build up speed and jump before the white line",""," a) Jump further than 50 inches to advance"," b) Don't jump after the white line"},new MyCallback(){ 
 				  public void onMessageClose(){ 
 					  soundShotBeginRace(true);
 				  }

@@ -16,10 +16,11 @@ public class Player extends Athlete{
 
 		 public void moveMe(float moved){
 			 super.moveMe(moved);
-			 if(parent.hurdlesOn && distanceTravelled<parent.track.trackWidth)
-				if((distanceTravelled)%(parent.track.ho)>parent.track.ho-parent.convertInchesToPixels((float)2) && 
-						(distanceTravelled)%(parent.track.ho)<parent.track.ho-parent.convertInchesToPixels((float).3)){
-					if(jumpY<parent.track.hurdleHeight/1.6 && jumping==false){
+			 if(parent.hurdlesOn && distanceTravelled<parent.track.trackWidth  && distanceTravelled>parent.track.ho/2)
+				if((distanceTravelled)%(parent.track.ho)>parent.track.ho-1
+						||
+						(distanceTravelled)%(parent.track.ho)<(mw*3)){
+					if(jumpY<parent.track.hurdleHeight/1.1 && jumping==false){
 						String entry = "("+((int)((distanceTravelled+parent.convertInchesToPixels(3))/parent.track.ho))+"-1)";
 						if(parent.track.knockedHurdles.indexOf(entry)==-1){
 							
@@ -35,6 +36,21 @@ public class Player extends Athlete{
 						}
 					}
 				}
+			 
+			 
+			 if(parent.longJumpOn==true && !finished){
+					
+					if(distanceTravelled>parent.track.jo-(mw*5)){
+						if(jumpY<=0){
+							longJumpLength=distanceTravelled-(parent.track.jo-(mw*5));
+							parent.parent.println("LJL: "+longJumpLength);
+							parent.parent.println("LJL INCHES: "+parent.convertPixelsToInches(longJumpLength));
+							endRace();
+							
+						}
+					}
+					
+				}
 		 }
 		 
 	
@@ -46,7 +62,9 @@ public class Player extends Athlete{
 		floatEndTime=parent.millis();
 		longEndTime = System.nanoTime();
 		myRaceTime=(float)((longEndTime-parent.longStartTime)/1000000000.0f);
-		
+		if(parent.longJumpOn)
+		  parent.raceStage=7;
+		else
 		if(parent.training==false)
 		parent.verifyTime(parent.millis(),System.nanoTime());
 		System.gc();
