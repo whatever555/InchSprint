@@ -6,7 +6,7 @@ import processing.core.PImage;
 
 public class Track {
 
-RaceClass parent;
+BotRaceClass parent;
 int distance;
 PImage trackImage;
 PImage trackImageFlat;
@@ -52,7 +52,7 @@ float bottomY;
 float barSize;
 
 
- public Track(RaceClass parent,int distance,int trackType,boolean hurdlesOn){
+ public Track(BotRaceClass parent,int distance,int trackType,boolean hurdlesOn){
 	 
 	 
 	 hurdDistributionSize=21;
@@ -91,6 +91,9 @@ float barSize;
 	 
 	// lineCount = (int) (distance/lineDistributionSize);
 	 
+	 if(parent.longJumpOn){
+		 lineCount=1;
+	 }
 	 parent.parent.println("HURDLE COUNT: "+hurdleCount +" TRACKWIDTH: "+trackWidth+" ");
 	 ho = parent.convertInchesToPixels(hurdDistributionSize);
 	 lo = parent.convertInchesToPixels(hurdDistributionSize);
@@ -219,6 +222,7 @@ float barSize;
 	 
  }
  
+
  public void reset(){
 	 
 	 knockedHurdles="";
@@ -320,7 +324,7 @@ public void drawFinishLine(){
 public void drawLongJumpSandPit(){
 	 
 	 float lineX = (jo);
-	 float lineDispX = (lineX/XDIV-(parent.player.distanceTravelled/XDIV) );
+	 float lineDispX = (lineX-(parent.player.distanceTravelled) )/XDIV;
 	 float offX = (float)(lineDispX/2.8);
 	 float nearX = lineDispX-offX+parent.player.XOFF;
 	 
@@ -330,19 +334,27 @@ public void drawLongJumpSandPit(){
 	 parent.parent.stroke(255,230);
 	 
 	 float newX = nearX+((offX/barSize)*((trackHeight-trackHeight/4))-trackHeight/divAmt);
-	 parent.parent.image(parent.parent.sandGraphic,nearX+60,(trackHeight-trackHeight/4)+2,nearX+1300,trackHeight/4-4);
+	 parent.parent.image(parent.parent.sandGraphic,nearX+60,(trackHeight-trackHeight/4)+2,nearX+(parent.convertInchesToPixels(24)),trackHeight/4-4);
 	// parent.parent.line(newX,trackHeight,newX,trackHeight+trackHeight/9);
 	 
 	 parent.parent.line(nearX,(trackHeight-trackHeight/4)+2,nearX,((trackHeight-trackHeight/4)+2)+trackHeight/4-4);
-	
-	 parent.parent.rect(nearX+100,(trackHeight-trackHeight/4-12)-2,nearX+500,12);
 
-	 parent.parent.textSize(10);
-	 parent.parent.textAlign(parent.parent.LEFT,parent.parent.CENTER);
+	 parent.parent.strokeWeight(2);
+	 parent.parent.stroke(30);
+	 parent.parent.fill(255);
 	 
-	 for(int i=5;i<12;i++)
-	 parent.parent.text(i, jo+(parent.convertInchesToPixels(i)), ((trackHeight-trackHeight/4-12)-2)+12/2);
+	 parent.parent.rect(nearX+100,(trackHeight-trackHeight/4-24)-2,(parent.convertInchesToPixels(24)),24);
+	 parent.parent.textSize(20);
+	 parent.parent.fill(0);
+	 for(int i=1;i<12;i++)
+	 parent.parent.text(""+i, nearX+(parent.convertInchesToPixels(i)), ((trackHeight-trackHeight/4-24)-2)+24/2);
 	 
+	 parent.parent.stroke(100,0,0);
+	 parent.parent.line(nearX+(parent.convertInchesToPixels(parent.player.longJumpLength*10)),(trackHeight-trackHeight/4)+2,nearX+(parent.convertInchesToPixels(parent.player.longJumpLength*10)),((trackHeight-trackHeight/4)+2)+trackHeight/4-4);
+		
+	
+	// parent.parent.rect(nearX+parent.player.longJumpLength,(trackHeight-trackHeight/4)+2,nearX+1300,trackHeight/4-4);
+		
 	/*
 	
 	 parent.parent.strokeWeight(2);

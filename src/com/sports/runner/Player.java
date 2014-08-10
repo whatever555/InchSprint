@@ -1,11 +1,15 @@
 package com.sports.runner;
 
+import java.util.ArrayList;
+
 public class Player extends Athlete{
 	
 	boolean raceOn=false;
 	
 	long serverTime=-1;
 	int framesHit = 0;
+	ArrayList<Float> sandBitsX;
+	ArrayList<Float> sandBitsY;
 	
 	public Player(RaceClass parent,int track){
 		super(parent,track);
@@ -13,9 +17,67 @@ public class Player extends Athlete{
 
 	}
 	
+	public void drawSittingPosition(){
+		
+		x = 3;
+		y = 5;
+
+		parent.moveY=0;
+		parent.movingY=0;
+		jumpingVelocity=0;
+		atEaseSpeed=0;
+		jumping=false;
+		jumpY=0;
+		if(parent.longJumpOn){
+			jumpingVelocity=0;
+			longJumpLength=(float) (((distanceTravelled)-(parent.track.jo)))+mw;
+		
+		}
+		drawSprites();
+		//sandBlast();
+		
+	}
+	
+	
+	public void gatherSand(float amt){
+		amt/=100;
+		System.out.println("GATHER SAND: "+amt);
+		sandBitsX= new ArrayList<Float>();
+		sandBitsY= new ArrayList<Float>();
+		for(int i=0;i<amt;i++){
+			float xx = XOFF-amt + (parent.parent.random((amt)*2));
+			float yy = (myY+mh)-amt/4 + (parent.parent.random((amt/2)));
+			
+			sandBitsX.add(xx);
+			sandBitsY.add(yy);
+		}
+
+	}
+	public void sandBlast(){
+		
+		for(int i=0;i<sandBitsX.size();i++){
+			int ra = (int)parent.parent.random(5);
+			int ra2 = 100+(int)parent.parent.random(150);
+			parent.parent.fill(ra2,ra2/2,0);
+			parent.parent.ellipse(sandBitsX.get(i),sandBitsY.get(i),ra,ra);
+			sandBitsY.set(i,sandBitsY.get(i)+(3-parent.parent.random(7)));
+			sandBitsX.set(i,sandBitsX.get(i)+(1-parent.parent.random(3)));
+			if(sandBitsY.get(i)> (myY+mh)+20){
+				sandBitsY.remove(i);
+				sandBitsX.remove(i);
+			}
+			
+		}
+		if(sandBitsX.size()>0)
+sandBitsX.remove(0);
+moveMe(sandBitsX.size());
+	}
 
 		 public void moveMe(float moved){
+			 
+
 			 super.moveMe(moved);
+			 
 			 if(parent.hurdlesOn && distanceTravelled<parent.track.trackWidth  && distanceTravelled>parent.track.ho/2)
 				if((distanceTravelled)%(parent.track.ho)>parent.track.ho-1
 						||
@@ -40,17 +102,26 @@ public class Player extends Athlete{
 			 
 			 if(parent.longJumpOn==true && !finished){
 					
-					if(distanceTravelled>parent.track.jo-(mw*5)){
+					if((distanceTravelled)>parent.track.jo-(mw*5)){
 						if(jumpY<=0){
-							longJumpLength=distanceTravelled-(parent.track.jo-(mw*5));
+							if((distanceTravelled)-(parent.track.jo)<0.05)
+								longJumpLength=0;
+							else{
+							
+							}
 							parent.parent.println("LJL: "+longJumpLength);
-							parent.parent.println("LJL INCHES: "+parent.convertPixelsToInches(longJumpLength));
+							parent.parent.println("LJL INCHES: "+parent.convertPixelsToInches(longJumpLength)+parent.convertPixelsToInches(mw*5));
+							//gatherSand(jumpingVelocity);
+							drawSittingPosition();
+						
 							endRace();
 							
 						}
 					}
 					
 				}
+			 if(parent.longJumpOn && finished)
+					drawSittingPosition();
 		 }
 		 
 	
@@ -62,8 +133,11 @@ public class Player extends Athlete{
 		floatEndTime=parent.millis();
 		longEndTime = System.nanoTime();
 		myRaceTime=(float)((longEndTime-parent.longStartTime)/1000000000.0f);
-		if(parent.longJumpOn)
+		if(parent.longJumpOn){
+			jumpingVelocity=0;
+			longJumpLength=(float) (((distanceTravelled)-(parent.track.jo-mw*2.5))/10)+mw;
 		  parent.raceStage=7;
+		}
 		else
 		if(parent.training==false)
 		parent.verifyTime(parent.millis(),System.nanoTime());

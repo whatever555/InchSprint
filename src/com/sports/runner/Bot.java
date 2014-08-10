@@ -13,12 +13,28 @@ public class Bot extends Athlete{
 		super.moveMe(moved);
 		if(parent.track.hurdlesOn &&jumpY<=0){
 			if(jumping==false && finished==false && distanceTravelled>parent.track.ho/2){
-				String entry = "("+((int)((distanceTravelled+parent.convertInchesToPixels(3))/parent.track.ho))+"-"+track+")";
-				if(parent.track.knockedHurdles.indexOf(entry)==-1)
-				if((distanceTravelled)%(parent.track.ho)>parent.track.ho-parent.convertInchesToPixels((float)1)){
+				
+				if((distanceTravelled)%(parent.track.ho)>parent.track.ho-parent.convertInchesToPixels((float).05)
+						||
+					(distanceTravelled)%(parent.track.ho)>parent.track.ho-moved
+						){
 				jumping=true;
-					jumpingTargetHeight=(parent.track.hurdleHeight/2)+(parent.parent.random((float) (parent.track.hurdleHeight*2.5)));
+					jumpingTargetHeight=(float) ((parent.track.hurdleHeight/2)+(parent.parent.random((float) (parent.track.hurdleHeight*1.5))));
 					jumpingVelocity=jumpingTargetHeight;
+				
+				}
+			}
+		}
+		
+		
+		if(parent.hurdlesOn && distanceTravelled<parent.track.trackWidth  && distanceTravelled>parent.track.ho/2)
+			if((distanceTravelled)%(parent.track.ho)>parent.track.ho-1
+					||
+					(distanceTravelled)%(parent.track.ho)<(parent.player.mw*3)){
+				
+				if(jumpY<parent.track.hurdleHeight){
+					String entry = "("+((int)((distanceTravelled+parent.convertInchesToPixels(3))/parent.track.ho))+"-"+track+")";
+					System.out.println("WE IN YPE");
 					if(ghost==true){
 						String e2="("+((int)((distanceTravelled+parent.convertInchesToPixels(3))/parent.track.ho))+"-1)";
 						
@@ -32,10 +48,10 @@ public class Bot extends Athlete{
 							System.out.println("NOT NOT FOUND IN THER: "+e2);
 						}
 					}
-					
+					System.out.println("WE IN SO...");
 					if(jumpingTargetHeight<parent.track.hurdleHeight){
 						parent.track.knockedHurdles+=entry;
-					
+						System.out.println("WE IN YET YET");
 						if(onScreen){
 						float l=1;
 					float r=1;
@@ -55,10 +71,11 @@ public class Bot extends Athlete{
 						hurdleLag= moved/2;
 						//System.out.println("TRCKNUM: "+track+" length  "+parent.finishTimes.length);
 						if(!ghost)
-						parent.finishTimes[track-2]+=2;
+						parent.finishTimes[track-2]+=.5;
 					}
+					
 				}
 			}
-		}
+		
 	}
 }

@@ -129,7 +129,7 @@ public class RaceClass extends Screen {
 				trackInInches=100;
 			}
 			shadowWidth = parent.random(1);
-			track=new Track(this,trackInInches,1,hurdlesOn);
+			//track=new Track(this,trackInInches,1,hurdlesOn);
 			displayMessageBool=true;
 			
 			
@@ -222,7 +222,7 @@ System.gc();
 	
 		
 		public void submitScore(float racetime){
-			
+			if((racetime)>0)
 			if(raceCancelled==false && training == false){
 			int leaderboardID = -1;
 			
@@ -257,7 +257,7 @@ System.gc();
 			SwarmLeaderboard.submitScore(leaderboardID, (float)(racetime));
 			parent.println("RACETIME: "+racetime+" PBID "+parent.getRaceIndex(trackInInches,hurdlesOn)+" currentPB "+parent.pbs[(parent.getRaceIndex(trackInInches,hurdlesOn))]);
 			if(parent.getRaceIndex(trackInInches,hurdlesOn)>-1)
-    		if(racetime<(parent.pbs[(parent.getRaceIndex(trackInInches,hurdlesOn))])){
+    		if(racetime<(parent.pbs[(parent.getRaceIndex(trackInInches,hurdlesOn))]) && racetime>0){
     			parent.updatePersonalBests(trackInInches,hurdlesOn,racetime);
 
     			parent.println("SAVING TO CLOUD 2");
@@ -322,8 +322,13 @@ System.gc();
 				//}
 			}
 			if(raceStage == 5){//race Over
+				if(!longJumpOn)
 				moveY=player.atEaseSpeed;
+				
 				updatePositions();
+				
+				
+			
 				lastMillis=parent.millis();
 				if(verified==false)
 				raceStage=6;
@@ -335,8 +340,13 @@ System.gc();
 			if(raceStage==6 || raceStage == 7){
 				parent.textAlign(parent.CENTER,parent.CENTER);
 				parent.textSize(22);
+				if(!longJumpOn)
 				moveY=player.atEaseSpeed;
+				
+				
 				updatePositions();
+				
+				
 				parent.fill(0,190);
 				parent.rect(0,0,parent.displayWidth,parent.displayHeight,3);
 				parent.fill(255);
@@ -609,6 +619,7 @@ System.gc();
 			
 			track.moveMe(movingY);
 			player.moveMe(movingY);
+				
 		}
 		
 	

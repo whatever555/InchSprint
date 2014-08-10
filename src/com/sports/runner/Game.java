@@ -484,7 +484,6 @@ if(message.indexOf("0:00:00")<0){
 			}
 			boolean paused=false;
 			public void saveToCloud(final String varName,final String newVal){
-				println("IN SAVING CUNTION");
 				
 				if (Swarm.isLoggedIn() && newVal!="0.0") {
 					Swarm.user.saveCloudData(varName, ""+newVal);
