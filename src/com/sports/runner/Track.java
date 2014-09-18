@@ -94,7 +94,6 @@ float barSize;
 	 if(parent.longJumpOn){
 		 lineCount=1;
 	 }
-	 parent.parent.println("HURDLE COUNT: "+hurdleCount +" TRACKWIDTH: "+trackWidth+" ");
 	 ho = parent.convertInchesToPixels(hurdDistributionSize);
 	 lo = parent.convertInchesToPixels(hurdDistributionSize);
 	 jo = parent.convertInchesToPixels(20);
@@ -181,7 +180,7 @@ float barSize;
 	 
 	
 	 drawTrackVertiLines();
-	 
+	 drawFinishLine();
 	
 	 parent.parent.noStroke();
 	 parent.fill(skyColour);
@@ -319,38 +318,50 @@ public void drawTrackVertiLines(){
 }
 
 public void drawFinishLine(){
+	 float lineX = (trackWidth);
+	 float lineDispX = (lineX/XDIV-(parent.player.distanceTravelled/XDIV) );
+	 float offX = (float)(lineDispX/2.8);
+	 float nearX = lineDispX-offX+playerFat+parent.player.XOFF;
+	 
+	if(nearX<dw+20 && nearX>-20){
+		parent.parent.strokeWeight(10);
+	 parent.parent.stroke(255,0,0,250);
+	 float newX = nearX+((offX/barSize)*(trackHeight-trackHeight/divAmt))+5;
+	 parent.parent.line(nearX,(float)trackHeight/(float)divAmt,newX,trackHeight);
+	 parent.parent.line(newX,trackHeight,newX,trackHeight+trackHeight/9);
+	}
 	
 }
 public void drawLongJumpSandPit(){
 	 
 	 float lineX = (jo);
 	 float lineDispX = (lineX-(parent.player.distanceTravelled) )/XDIV;
-	 float offX = (float)(lineDispX/2.8);
-	 float nearX = lineDispX-offX+parent.player.XOFF;
+	// float offX = (float)(lineDispX/2.8);
+	// float nearX = lineDispX-offX+parent.player.XOFF;
 	 
-	if(nearX<dw+20 && nearX+1300>-20){
+	if(lineDispX<dw+20 && lineDispX+1300>-20){
 		
 		parent.parent.strokeWeight(6);
 	 parent.parent.stroke(255,230);
 	 
-	 float newX = nearX+((offX/barSize)*((trackHeight-trackHeight/4))-trackHeight/divAmt);
-	 parent.parent.image(parent.parent.sandGraphic,nearX+60,(trackHeight-trackHeight/4)+2,nearX+(parent.convertInchesToPixels(24)),trackHeight/4-4);
+	// float newX = nearX+((offX/barSize)*((trackHeight-trackHeight/4))-trackHeight/divAmt);
+	 parent.parent.image(parent.parent.sandGraphic,lineDispX+60,(trackHeight-trackHeight/4)+2,lineDispX+(parent.convertInchesToPixels(44)),trackHeight/4-4);
 	// parent.parent.line(newX,trackHeight,newX,trackHeight+trackHeight/9);
 	 
-	 parent.parent.line(nearX,(trackHeight-trackHeight/4)+2,nearX,((trackHeight-trackHeight/4)+2)+trackHeight/4-4);
+	 parent.parent.line(lineDispX,(trackHeight-trackHeight/4)+2,lineDispX,((trackHeight-trackHeight/4)+2)+trackHeight/4-4);
 
 	 parent.parent.strokeWeight(2);
 	 parent.parent.stroke(30);
 	 parent.parent.fill(255);
 	 
-	 parent.parent.rect(nearX+100,(trackHeight-trackHeight/4-24)-2,(parent.convertInchesToPixels(24)),24);
+	 parent.parent.rect(lineDispX+100,(trackHeight-trackHeight/4-24)-2,(parent.convertInchesToPixels(24)),24);
 	 parent.parent.textSize(20);
 	 parent.parent.fill(0);
-	 for(int i=1;i<12;i++)
-	 parent.parent.text(""+i, nearX+(parent.convertInchesToPixels(i)), ((trackHeight-trackHeight/4-24)-2)+24/2);
+	 for(int i=1;i<40;i++)
+	 parent.parent.text(""+i, lineDispX+(parent.convertInchesToPixels(i)), ((trackHeight-trackHeight/4-24)-2)+24/2);
 	 
 	 parent.parent.stroke(100,0,0);
-	 parent.parent.line(nearX+(parent.convertInchesToPixels(parent.player.longJumpLength*10)),(trackHeight-trackHeight/4)+2,nearX+(parent.convertInchesToPixels(parent.player.longJumpLength*10)),((trackHeight-trackHeight/4)+2)+trackHeight/4-4);
+	 parent.parent.line(lineDispX+(parent.convertInchesToPixels(parent.player.longJumpLength*10)),(trackHeight-trackHeight/4)+2,lineDispX+(parent.convertInchesToPixels(parent.player.longJumpLength*10)),((trackHeight-trackHeight/4)+2)+trackHeight/4-4);
 		
 	
 	// parent.parent.rect(nearX+parent.player.longJumpLength,(trackHeight-trackHeight/4)+2,nearX+1300,trackHeight/4-4);

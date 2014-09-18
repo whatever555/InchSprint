@@ -34,7 +34,6 @@ public class Bot extends Athlete{
 				
 				if(jumpY<parent.track.hurdleHeight){
 					String entry = "("+((int)((distanceTravelled+parent.convertInchesToPixels(3))/parent.track.ho))+"-"+track+")";
-					System.out.println("WE IN YPE");
 					if(ghost==true){
 						String e2="("+((int)((distanceTravelled+parent.convertInchesToPixels(3))/parent.track.ho))+"-1)";
 						
@@ -42,16 +41,12 @@ public class Bot extends Athlete{
 							jumpingTargetHeight=parent.track.hurdleHeight-5;
 							jumpingVelocity=jumpingTargetHeight;
 							
-							System.out.println("FOUND IN THER: "+e2);
 						}else{
 							jumpingTargetHeight=parent.track.hurdleHeight;
-							System.out.println("NOT NOT FOUND IN THER: "+e2);
 						}
 					}
-					System.out.println("WE IN SO...");
 					if(jumpingTargetHeight<parent.track.hurdleHeight){
 						parent.track.knockedHurdles+=entry;
-						System.out.println("WE IN YET YET");
 						if(onScreen){
 						float l=1;
 					float r=1;
@@ -63,7 +58,6 @@ public class Bot extends Athlete{
 						r=1-dd;
 					l=1-r;
 					float v = 1-(parent.parent.abs(r-l)/2);
-					System.out.println("VOLUME: "+l+"  Right>> "+r);
 					parent.gameSounds.playSound("hurdle_drop",l,r,v);
 					
 						}

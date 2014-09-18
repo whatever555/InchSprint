@@ -22,7 +22,7 @@ public class BotRaceClass extends RaceClass{
 
 	public void setMeUpOnce(){
 
-		track=new Track(this,trackInInches,1,hurdlesOn);
+		track=new Track(this,trackInInches,2,hurdlesOn);
 		displayMessageBool=true;
 		if(raceMode.equals("Time Trial") && !ghostType.equals("No Ghost Runner"))
 			botCount = 1;
@@ -58,7 +58,7 @@ public class BotRaceClass extends RaceClass{
 		for(int i=0;i<bots.length;i++){
 			bots[i].reset();
 			float inchPerSec = 10 - parent.random(5);
-			finishTimes[i] = ((40+(trackInInches/10)) - parent.random(41));
+			finishTimes[i] = (((trackInInches/difficulty)+(trackInInches/parent.max(difficulty,10))) - parent.random(trackInInches/difficulty+1));
 			//float speed = track.distance/inchPerSec;
 			speeds[i] = convertInchesToPixels(inchPerSec)/fps;
 		}
@@ -144,6 +144,7 @@ public void drawBeginPositions(){
 		
 		for(int i=bots.length-1;i>-1;i--){
 			
+		
 			float mSpeed=0;
 			float distanceLeft = track.trackWidth - bots[i].distanceTravelled;
 			float timeGone = (parent.millis()-floatStartTime)/1000;

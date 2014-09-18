@@ -15,7 +15,7 @@ public class MenuClass extends Screen{
 	String practiceMode;
 	
 	int scrollY=-100;
-
+boolean championshipRace=false;
 	PFont sportsFont;
 	
 	GameSounds gameSounds;
@@ -63,7 +63,7 @@ public class MenuClass extends Screen{
 	public void beginRace(){
 		 
 		    
-		    parent.showRaceScreen(botCount,hurdlesOn,raceLength,raceMode,ghostType,practiceMode,raceAgainst,longJumpOn);
+		    parent.showRaceScreen(-1,(int)parent.random(10)+1,false,botCount,hurdlesOn,raceLength,raceMode,ghostType,practiceMode,raceAgainst,longJumpOn);
 		
 	}
 	public void showHurdleOptions(){
@@ -153,6 +153,68 @@ public void showPersonalBestOptions(){
 		buttons.add(new MenuButton(this,"Off the Blocks PB",6,-1));
 		
 	}
+
+public void showChampionshipLevels(){
+	 menuHeading = "Championship";
+		buttons=new ArrayList<MenuButton>();
+		int cnt=0;
+		int stageCount = 0;
+		while(cnt<parent.championshipData.length()){
+			if(cnt%3==0)
+				stageCount++;
+			cnt++;
+		}
+		cnt=0;
+		if(stageCount<=0)
+			stageCount=1;
+	for(int i=parent.championshipData.length()-1;i>=0;i--){
+		if(i%3==0){
+			
+			MenuButton m = new MenuButton(this,"Stage "+((stageCount-cnt)),cnt,-1);
+			cnt++;
+			while(parent.championshipData.length()<i+3)
+				parent.championshipData+="9";
+
+			m.threeMedals=parent.championshipData.substring(i,i+3);
+			//m.medal=parent.championshipData.charAt(i);
+			buttons.add(m);
+		}
+	
+	}
+}
+
+int selectedChampionshipStage = 0;
+int selectedStage = 0;
+public void loadChampionshipEvent(String s){
+	int si=Integer.parseInt(s);
+	selectedStage=si;
+	parent.loadStage(((selectedChampionshipStage)+selectedStage)-1);
+}
+public void showChampionshipEventLevels(String s){
+	
+	int si=(Integer.parseInt(s)*3)-3;
+	selectedChampionshipStage = si;
+	boolean breakOff=false;
+	 menuHeading = "Championship";
+		buttons=new ArrayList<MenuButton>();
+		int ind=0;
+	for(int i=si;i<si+(3-(si%3));i++){
+		if(i<parent.championshipData.length() && !breakOff){
+		
+			MenuButton m = new MenuButton(this,"Event "+(ind+1),ind,-1);
+			
+			m.medal=parent.championshipData.charAt(i);
+			buttons.add(m);
+			if(m.medal==('9') || m.medal==('0')){
+				breakOff=true;
+			}
+		}else{
+			buttons.add(new MenuButton(this,"Event "+(ind+1),ind,1));
+		}
+	ind++;	
+	}
+	
+}
 	
 	public void showOppositionOptions(){
 		menuHeading = "Competitors";
@@ -161,14 +223,14 @@ public void showPersonalBestOptions(){
 
 		buttons.add(new MenuButton(this,"No Opponents",0,-1));
 		buttons.add(new MenuButton(this,"1 Opponent",1,-1));
-		buttons.add(new MenuButton(this,"5 Opponents",2,-1));
-		buttons.add(new MenuButton(this,"10 Opponents",3,-1));
-		buttons.add(new MenuButton(this,"15 Opponents",4,-1));
-		buttons.add(new MenuButton(this,"20 Opponents",5,-1));
-		buttons.add(new MenuButton(this,"25 Opponents",6,1));
-		buttons.add(new MenuButton(this,"30 Opponents",7,1));
-		buttons.add(new MenuButton(this,"35 Opponents",8,1));
-		buttons.add(new MenuButton(this,"40 Opponents",9,-1));
+		int cnt=2;
+		for(int i=5;i<=40;i+=5){
+			if(i<=parent.maxBots)
+		buttons.add(new MenuButton(this,i+" Opponents",cnt,-1));
+			else
+		buttons.add(new MenuButton(this,i+" Opponents",cnt,1,"Unlock this by playing Championship mode"));
+		cnt++;	
+		}
 		}else{
 			botCount=0;
 			showTimetrialOptions();
@@ -263,7 +325,7 @@ public void showPersonalBestOptions(){
 			ai++;
 			
 			menuHeight = buttons.size()*buttonHeight;
-			
+			championshipRace=false;
 			showScreen();
 	}
 	
@@ -326,7 +388,6 @@ int bY=0;
 		for(int i=0;i<buttons.size();i++){
 		if(buttons.get(i).hitMe(parent.mouseX, parent.mouseY)){
 				
-			parent.println("TRAINING PROGRESS "+parent.trainingProgress);
 			
 			gameSounds.playSound("click");
 			
@@ -342,7 +403,7 @@ int bY=0;
 			}else
 			
 				if(buttons.get(i).text.equals("Quick Race")){
-					parent.showRaceScreen(12,false,60,"Race","No Ghost",practiceMode,"session",false);
+					parent.showRaceScreen(-1,(int)parent.random(10)+1,false,12,false,60,"Race","No Ghost",practiceMode,"session",false);
 				}else
 					if(buttons.get(i).text.equals("Account")){
 						showSwarmDashBoard();
@@ -376,7 +437,7 @@ int bY=0;
 			}else
 				if(buttons.get(i).text.indexOf("Ghost")>0){
 					ghostType = buttons.get(i).text;
-					if(!ghostType.equals("No Ghost"))
+					if(!ghostType.equals("No Ghost Runner"))
 						showGhostOptions();
 					else
 						showRaceLengthOptions();
@@ -473,7 +534,26 @@ int bY=0;
 						parent.showMessage("controls");
 						
 					    
-					}
+					}else
+						if(buttons.get(i).text.equals("Championship")){
+							showChampionshipLevels();
+							
+						    
+						}else
+							if(buttons.get(i).text.indexOf("Stage")==0){
+								String[] str = buttons.get(i).text.split(" ");
+								
+								showChampionshipEventLevels(str[1]);
+								
+							    
+							}else
+								if(buttons.get(i).text.indexOf("Event")==0){
+									String[] str = buttons.get(i).text.split(" ");
+									
+									loadChampionshipEvent(str[1]);
+									
+								    
+								}
 			
 		}else{
 			buttons.get(i).pressed=false;

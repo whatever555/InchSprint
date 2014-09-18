@@ -19,19 +19,26 @@ public class MenuButton {
 	int textX,tTextX;
 	boolean pressed=false;
 	
+	String threeMedals="";
 	int LOCKED;
 	boolean tweening=false;
+	char medal ='0';
 	
 	String contentLockedMessage;
 	public MenuButton(MenuClass parent,String text,int index,int LOCKED){
+	
 		initMe(parent,text,index,LOCKED,"");
 	}
 	
 	public MenuButton(MenuClass parent,String text,int index,int LOCKED,String contentLockedMessage){
+		
 		initMe(parent,text,index,LOCKED,contentLockedMessage);
 	}
 	
+	
+	
 	public void initMe(MenuClass parent,String text, int index, int LOCKED,String contentLockedMessage){
+	
 		this.parent=parent;
 		this.LOCKED=LOCKED;
 		this.contentLockedMessage=contentLockedMessage;
@@ -70,9 +77,31 @@ public class MenuButton {
 		
 		
 		if(LOCKED > 0 ){
-			parent.parent.image(parent.parent.lockedImage,x+(w-h),showY+(h/12),h-(h/3),h-(h/6));
+			//parent.parent.image(parent.parent.lockedImage,x+(w-h),showY+(h/12),h-(h/3),h-(h/6));
 			parent.parent.showButton(x,showY,w,h,showCol,text,parent.parent.lockedImage);
 		}else
+			if(medal != '0' ){
+				if(medal==('1'))
+					parent.parent.showButton(x,showY,w,h,showCol,text,parent.parent.goldMedal);
+				else if(medal=='2')
+					parent.parent.showButton(x,showY,w,h,showCol,text,parent.parent.silverMedal);
+				else if(medal=='3')
+					parent.parent.showButton(x,showY,w,h,showCol,text,parent.parent.bronzeMedal);
+				else{
+					parent.parent.showButton(x,showY,w,h,showCol,text);
+				
+				}
+				
+				
+			}else
+		if(threeMedals.length()==3){
+			while(threeMedals.length()<3){
+				threeMedals+="0";
+			}
+
+			parent.parent.showButton(x,showY,w,h,showCol,text,threeMedals);
+		}
+			else
 			parent.parent.showButton(x,showY,w,h,showCol,text);
 		/*
 		parent.parent.fill(0);

@@ -18,6 +18,10 @@ public class RaceClass extends Screen {
 	boolean clickSetAllow=false;
 	boolean clickSet=false;
 	
+	float difficulty=3;
+	
+	float minPos = 2;
+	boolean championshipRace=false;
 	String raceAgainst = "session";
 	float shadowWidth;
 
@@ -86,6 +90,7 @@ public class RaceClass extends Screen {
 	
 	Intent menuIntent;
 	
+	boolean medalRace=false;
 
 	float[] finishTimes;
 	int falseStartCount = 0;
@@ -120,7 +125,7 @@ public class RaceClass extends Screen {
 		public void setMeUpOnce(){
 
 			if(practiceMode.equals("Running")){
-				trackInInches=40;
+				trackInInches=30;
 			}
 			if(practiceMode.equals("Hurdles")){
 				trackInInches=100;
@@ -297,6 +302,7 @@ System.gc();
 					dragging=false;
 					raceStage=4;
 					r=(int)parent.random(4);
+					parent.println("r=(int)parent.random(4) =: "+r);
 					startRace();
 			//	}
 			}
@@ -420,7 +426,7 @@ System.gc();
 					}
 					
 					if(practiceMode.equals("Long Jump")){
-						if(player.longJumpLength<=50){
+						if(player.longJumpLength<=2){
 							
 							if(r==0){
 							parent.text("Nope!",parent.displayWidth/2,(parent.displayHeight/2)-40);
@@ -428,7 +434,7 @@ System.gc();
 							}else
 							if(r==1){
 								parent.text("Close!",parent.displayWidth/2,(parent.displayHeight/2)-40);
-								parent.text("Don't jump too soon.",parent.displayWidth/2,(parent.displayHeight/2));
+								parent.text("Don't jump too late.",parent.displayWidth/2,(parent.displayHeight/2));
 								
 							}else
 							if(r==2){
@@ -469,7 +475,7 @@ System.gc();
 				parent.text("Position: "+playerPosition,parent.displayWidth/2,(parent.displayHeight/2)+120);
 				}
 				if(longJumpOn){
-					parent.text("Jump Length: "+convertPixelsToInches(player.longJumpLength)+ " inches",parent.displayWidth/2,(parent.displayHeight/2)+120);
+					parent.text("Jump Length: "+(player.longJumpLength)+ " inches",parent.displayWidth/2,(parent.displayHeight/2)+120);
 				}
 				
 			}
@@ -647,14 +653,39 @@ System.gc();
 			return (float)(inc * INCHWIDTH);
 		}
 		
-		
+		boolean champAdvance=false;
 		public void endRace(boolean legitFinish){
-			
+			champAdvance=false;
 			displayMessageBool=false;
 			
 			setSaid=false;
 			raceStage=5;
 			raceOn=false;
+			
+			
+			if(championshipRace){
+				float comparisonFloat=1;
+				
+				if(longJumpOn==true){
+				comparisonFloat=player.longJumpLength;
+				if(comparisonFloat<minPos){
+					champAdvance=true;
+					parent.setMedal('1');
+				}else
+					if(comparisonFloat-(minPos/7)<minPos){
+						parent.setMedal('2');
+					}
+					else
+						if(comparisonFloat-(minPos/3)<minPos){
+							parent.setMedal('3');
+						}
+				}else if(playerPosition<=9){
+					parent.setMedal((""+playerPosition).charAt(0));
+				}
+					
+				
+				
+			}
 			
 			if(practiceMode.equals("Running")){
 				if(parent.trainingProgress<1){
@@ -669,7 +700,7 @@ System.gc();
 					  public void onMessageClose(){ 
 						  if(parent.mouseY>parent.activeMP.y){
 						  practiceMode ="Starts";
-							parent.showRaceScreen(0,false,5,"Training","No Ghost","Starts","session",false);
+							parent.showRaceScreen(-1,(int)parent.random(10)+1,false,0,false,10,"Training","No Ghost","Starts","session",false);
 						  }else{
 							  setMeUp();
 						  }
@@ -678,7 +709,7 @@ System.gc();
 			}
 			
 			if(practiceMode.equals("Long Jump")){
-				if(parent.trainingProgress<4 && player.longJumpLength>500){
+				if(parent.trainingProgress<4 && player.longJumpLength>2){
 					parent.showSingleMessagePop(new String[]{"Content Unlocked!","Championship mode now available"},null);
 					parent.trainingProgress=4;
 					parent.saveToCloud("Training Progress", "4");
@@ -703,8 +734,16 @@ System.gc();
 				if(player.hurdlesHit==0){
 				if(parent.trainingProgress<3){
 					parent.trainingProgress=3;
-					parent.showSingleMessagePop(new String[]{"Content Unlocked!","You can now compete in hurdle races"},null);
+					parent.showSingleMessagePop(new String[]{"Content Unlocked!","You can now compete in hurdle races"},	new MyCallback(){ 
+						  public void onMessageClose(){ 
+							 
+								  showLongJumpAdvanceScreen(); 
+							
+						  }
+					});				
 					parent.saveToCloud("Training Progress", "3");
+				}else if(parent.trainingProgress>=3){
+				showLongJumpAdvanceScreen(); 
 				}
 				}
 			}
@@ -716,7 +755,7 @@ System.gc();
 						  if(parent.mouseY>parent.activeMP.y){
 							  //todo check if this is always called 
 						  practiceMode ="Hurdles";
-							parent.showRaceScreen(0,true,70,"Training","No Ghost","Hurdles","session",false);
+							parent.showRaceScreen(-1,(int)parent.random(10)+1,false,0,true,30,"Training","No Ghost","Hurdles","session",false);
 						  }else{
 							 // setMeUp();
 						  }
@@ -760,6 +799,20 @@ System.gc();
 			t.start();
 		}
 		
+		
+		public void showLongJumpAdvanceScreen(){
+			parent.showSingleMessagePop(new String[]{"Tap Here to Advance","Next Stage: Long Jump Practice"},
+					new MyCallback(){ 
+				  public void onMessageClose(){ 
+					  if(parent.mouseY>parent.activeMP.y){
+					  practiceMode ="Long Jump";
+						parent.showRaceScreen(-1,(int)parent.random(10)+1,false,0,false,200,"Training","No Ghost","Long","session",true);
+					  }else{
+						  setMeUp();
+					  }
+				  }
+			},2,2);
+		}
 
 		public void beginRunningTraining(){
 			if(displayMessageBool){
@@ -909,25 +962,18 @@ System.gc();
 		
 		
 		public void verifyTime(final float floatEnd, final long longEnd){
-			parent.println("VERIFY TIME");
 			Thread t = new Thread() {
 			    public void run() {
-			    	parent.println("VERIFY TIME RUNNING");
 			    	float f = parent.millis();
-			    	parent.println("VERIFY CHECKING LIVE SITE");
 			    	String[] temp = parent.loadStrings("http://imaga.me/now.php?"+parent.random(999999));
-			    	parent.println("VERIFY GOT LIVE SITE DATA");
 			    	long serverRaceTime=-1;
 					
 			    	if(temp!=null)
 			    		{
-			    		parent.println("VERIFY WASNT NULL");
 							try {
-								parent.println("VERIFY TRYGING SOME MWAHT");
 								serverRaceTime = (long) ((Long.parseLong(temp[0])-serverStartTime)-(parent.millis()-f));
 							}
 						catch(Exception e){
-							parent.println("VERIFY CATCHING THE EXCEPTOPNM");
 							serverRaceTime=-1;
 						}
 						

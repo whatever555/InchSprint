@@ -27,13 +27,18 @@ public class Game extends PApplet{
 	
 	Vibrator v; // Vibrate for 500 milliseconds
 
+	int maxBots = 1;
 	PImage sandGraphic;
 	PImage buttonGraphic;
 	PImage buttonLeftGraphic;
 	PImage buttonRightGraphic;
 	PImage homeIcon;
 	PImage flegs;
+	PImage goldMedal;
+	PImage silverMedal;
+	PImage bronzeMedal;
 	int TouchEvents;
+	String  championshipData;
 	int championshipProgress=0;
 	int trainingProgress=0;
 	Screen activeScreen;
@@ -43,6 +48,7 @@ public class Game extends PApplet{
 	PImage lockedImage;
 	PFont messageFont;
 	
+	CDS cds;
 	
 	PImage bgImage;	
 	int setVarCount=0;
@@ -64,6 +70,10 @@ public class Game extends PApplet{
 	float[] pbs;
 	
 	public void setup(){
+		cds = new CDS();
+		goldMedal=loadImage("graphics/medals/gold.png");
+		silverMedal=loadImage("graphics/medals/silver.png");
+		bronzeMedal=loadImage("graphics/medals/bronze.png");
 		homeIcon=loadImage("graphics/home.png");
 		buttonGraphic=loadImage("graphics/button.png");
 		sandGraphic=loadImage("graphics/sand.jpg");
@@ -78,6 +88,9 @@ public class Game extends PApplet{
 		for(int i = 0; i <pbs.length;i++){
 			pbs[i]=99999;
 		}
+		
+		championshipData="55555";
+		
 		flegs = loadImage("images/flegs.png");
 		countryList=new String[]{"Afghanistan","Albania","Algeria","American Samoa","Andorra","Angola","Anguilla","Antigua and Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central African Republic","Chad","Chile","China","Christmas Island","Colombia","Comoros","Cook Islands","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Côte d'Ivoire","Democratic Republic of the Congo","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macao","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Martinique","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","Netherlands Antilles","New Zealand","Nicaragua","Niger","Nigeria","Niue","Norfolk Island","North Korea","Norway","Oman","Pakistan","Palau","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Pitcairn Islands","Poland","Portugal","Puerto Rico","Qatar","Republic of the Congo","Romania","Russian Federation","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Pierre","Saint Vicent and the Grenadines","Samoa","San Marino","Sao Tomé and Príncipe","Saudi Arabia","Senegal","Serbia and Montenegro","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Soloman Islands","Somalia","South Africa","South Georgia","South Korea","Soviet Union","Spain","Sri Lanka","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Tibet","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Turks and Caicos Islands","Tuvalu","UAE","Uganda","Ukraine","United Kingdom","United States of America","Uruguay","US Virgin Islands","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Wallis and Futuna","Yemen","Zambia","Zimbabwe"};
 		
@@ -126,9 +139,7 @@ public class Game extends PApplet{
 	}
 	
 	public void loadGame(){
-		for(int i=0;i<pbs.length;i++){
-			println("PBS: "+i+ " == "+pbs[i]);
-		}
+		
 		lockedImage=loadImage("images/lock.png");
 		mainMenu=new MenuClass(this);
 		race = new BotRaceClass(this);
@@ -145,6 +156,11 @@ public class Game extends PApplet{
 		activeMP.showMe();
 		
 		showFlashMessages();
+		
+		if(showRaceLoadingScreen==true){
+			
+			showLoadRaceScreen();
+		}
 		}else{
 		showLoadingMessage();	
 		}
@@ -187,9 +203,56 @@ public class Game extends PApplet{
 		text(str,displayWidth/2,28);
 		noStroke();
 	}
+	ChampionshipEvent currentEvent;
 	
-	public void showRaceScreen(int botCount,boolean hurdlesOn,int trackInInches,String raceMode,String ghostType,String practiceMode,String raceAgainst,boolean longJumpOn){
+	public void setMedal(char med){
+		while(championshipData.length()<currentEvent.index+1){
+			championshipData+="0";
+		}
+		
+		if(Integer.parseInt(""+med)<2){
+			if(maxBots<race.botCount){
+				maxBots = race.botCount;
+
+				flashMessages.add("Content Unlocked");
+			}
+		}
+		char[] myNameChars = championshipData.toCharArray();
+		if(Integer.parseInt(""+med)<Integer.parseInt(""+myNameChars[currentEvent.index]) || Integer.parseInt(""+myNameChars[currentEvent.index])==0){
+		myNameChars[currentEvent.index] = med;
+		championshipData = String.valueOf(myNameChars);
+		}
+		while(championshipData.length()<currentEvent.index+2)
+			championshipData+='0';
+		
+		saveToCloud("Championship Data",championshipData);
+		
+		
+	}
+	boolean showRaceLoadingScreen=false;
+	public void loadStage(int i){
+		race.championshipRace=true;
+		ChampionshipEvent c = cds.ce.get(i);
+		currentEvent = c;
+		
+		showRaceLoadingScreen=true;
+		
+	}
+	
+	public void loadTheRace(){
+		showRaceScreen(currentEvent.minPos,currentEvent.difficulty,currentEvent.medalRace,currentEvent.bots,currentEvent.hurdles,currentEvent.trackLength,currentEvent.raceMode,"No Ghost","OFF",null,currentEvent.longJump);
+		
+	}
+	public void showRaceScreen(float minPos,float difficulty,boolean medalRace,int botCount,boolean hurdlesOn,int trackInInches,String raceMode,String ghostType,String practiceMode,String raceAgainst,boolean longJumpOn){
 		noLoop();	
+		if(minPos==-1)
+			race.championshipRace=false;
+		else
+			race.championshipRace=true;
+		
+		race.minPos=minPos;
+		race.difficulty=difficulty;
+		race.medalRace=medalRace;
 		race.longJumpOn=longJumpOn;
 		race.raceAgainst=raceAgainst;
 			race.fastestTimeYet=999999999;
@@ -203,6 +266,37 @@ public class Game extends PApplet{
 		    currentScreen="race";
 		    activeScreen=race;
 		    loop();
+	}
+	
+	
+	public void showLoadRaceScreen(){
+		fill(0,240);
+		noStroke();
+		noTint();
+		rect(0,0,displayWidth,displayHeight);
+		int inc=10;
+		textAlign(LEFT,TOP);
+		textSize(20);
+		textFont(messageFont);
+		
+		fill(255);
+		text("Event Details",5,5);
+		textSize(14);
+		int yy = 25;
+		fill(120);
+		line(0,yy,0,yy);
+		fill(255);
+		yy+=18;
+		text("Competitors",5,yy);
+		text(currentEvent.bots,displayWidth/2,yy);
+
+		yy+=18;
+		text("Hurdles",5,yy);
+		text("No",displayWidth/2,yy);
+		
+		yy+=18;
+		text("Track Length",5,yy);
+		text(currentEvent.trackLength+ " Inches",displayWidth/2,yy);
 	}
 	
 	public void showMainMenuScreen(){
@@ -284,6 +378,11 @@ if(message.indexOf("0:00:00")<0){
 	
 	public boolean surfaceKeyDown(int code, KeyEvent event) {
 		  if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+
+				 if(showRaceLoadingScreen==true){
+					 showRaceLoadingScreen=false;
+				 }else{
+				
 			  noStroke();
 			  noTint();
 			  noLoop();
@@ -303,6 +402,7 @@ if(message.indexOf("0:00:00")<0){
 			  }
 			  }
 			 loop();
+				 }
 		  }
 		  return false;
 		}
@@ -313,6 +413,9 @@ if(message.indexOf("0:00:00")<0){
 
 		
 		public void mousePressed(){
+			
+			
+		
 			if(!activeMP.active){
 			if(loaded)
 			activeScreen.mousePressed();
@@ -321,9 +424,14 @@ if(message.indexOf("0:00:00")<0){
 			}else{
 				mouseDownOnMessage=true;
 			}
+			
 		}
 		public void mouseReleased(){
-			
+			if(showRaceLoadingScreen==true){
+				showRaceLoadingScreen=false;
+				 loadTheRace();
+				 
+			}else{
 			if(activeMP.active && mouseDownOnMessage==true){
 				if(millis() - activeMP.creationMilliTime > activeMP.minLifeMillis)
 				hideMessages();
@@ -333,9 +441,10 @@ if(message.indexOf("0:00:00")<0){
 			if(loaded)
 			activeScreen.mouseReleased();
 			
-			
+			}
 		}
 		
+	
 		boolean mouseDownOnMessage=false;
 
 		public void mouseDragged(){
@@ -345,9 +454,7 @@ if(message.indexOf("0:00:00")<0){
 		}
 		
 		
-		public void loadRace(){
-			
-		}
+		
 		
 		
 		  SwarmLoginListener mySwarmLoginListener = new SwarmLoginListener() {
@@ -356,26 +463,22 @@ if(message.indexOf("0:00:00")<0){
 		    	// (when a login dialog is displayed to the user).
 		    	public void loginStarted() {
 		    		
-		    		println("LOGIN STARTESD");
 		    		//getCloudVars();
 		    	}
 
 		    	// This method is called if the user cancels the login process.
 		    	public void loginCanceled() {
-		    		println("LOGIN CANCELLED");
 		    		getCloudVars();
 		    	}
 
 		    	// This method is called when the user has successfully logged in.
 		    	public void userLoggedIn(SwarmActiveUser user) {
-		    		println("LOGIN LOGGED IN");
 		    		getCloudVars();
 		    		
 		    	}
 
 		    	// This method is called when the user logs out.
 		    	public void userLoggedOut() {
-		    		println("LOGIN LOGIN OUT");
 		    		getCloudVars();
 		    	}
 
@@ -426,16 +529,17 @@ if(message.indexOf("0:00:00")<0){
 
 	    		showLoadingMessage();
 		    	setVarCount=0;
-		    	totalVarCount=3;
+		    	totalVarCount=5;
 	    		setFromCloud("Training Progress");
+	    		setFromCloud("Championship Data");
 	    		setFromCloud("Championship Progress");
 	    		setFromCloud("Personal Bests");
+	    		setFromCloud("Max Bots");
 		    }
 		    
 			public boolean surfaceTouchEvent(MotionEvent event) {
 
 				 TouchEvents = event.getPointerCount();
-				
 				
 				  if(loaded){
 				  if(TouchEvents>1 && race.player.jumpY<1 && race.jumpLoading==false && race.player.jumping==false){
@@ -449,7 +553,7 @@ if(message.indexOf("0:00:00")<0){
 							race.lastY=race.getLastY(mouseY);
 							race.player.jumping=true;
 							race.jumpLoading=false;
-							race.player.jumpingTargetHeight = (float) (race.track.hurdleHeight*1.5);
+							race.player.jumpingTargetHeight = (float) (race.track.hurdleHeight*2);
 							float avgSpeed = 0;
 							for(int i=0;i<race.player.last3Speeds.size();i++){
 								avgSpeed+=race.player.last3Speeds.get(i);
@@ -459,11 +563,12 @@ if(message.indexOf("0:00:00")<0){
 							if( race.longJumpOn==true)
 								avgSpeed+=(race.moveY)+race.player.last3Speeds.get(race.player.last3Speeds.size()-1)+race.player.last3Speeds.get(race.player.last3Speeds.size()-2);
 							
-								race.player.jumpingVelocity=avgSpeed;
+								race.player.jumpingVelocity=avgSpeed+5;
 							
 						}
 				  }
 				  }
+				 
 				  return super.surfaceTouchEvent(event);
 				}
 			
@@ -527,6 +632,9 @@ if(message.indexOf("0:00:00")<0){
 					    	 if(varName.equals("Championship Progress"))
 						        	championshipProgress=Integer.parseInt(data);
 					    	 
+					    	 if(varName.equals("Championship Data"))
+						        	championshipData=(data);
+					    	 
 					        if(varName.equals("Personal Bests")){
 					        	if(data.equals("0"))
 				        			data="";
@@ -552,14 +660,12 @@ if(message.indexOf("0:00:00")<0){
 			}
 			
 			public void localisePBS(String str){
-				println("LOCALISING BITCHES");
-				println(str);
+				
 				String[] stra = str.split(",");
 				for(int i=0;i<stra.length;i++)
 					try{
 					pbs[i] =Float.parseFloat(stra[i]);
 					}catch(Exception e){
-						println("CAUGHT EXCEPTION FLOAT "+stra[i]);
 					}
 			}
 			
@@ -687,19 +793,22 @@ if(message.indexOf("0:00:00")<0){
 			
 			
 			public void showButton(int x, int y, int w, int h){
-				displayButton(x,y,w,h,-1,null,null);
+				displayButton(x,y,w,h,-1,null,null,null);
 			}
 			public void showButton(int x, int y, int w, int h,int tintCol){
-				displayButton(x,y,w,h,tintCol,null,null);
+				displayButton(x,y,w,h,tintCol,null,null,null);
 			}
 			public void showButton(int x, int y, int w, int h,int tintCol,String text){
-				displayButton(x,y,w,h,tintCol,text,null);
+				displayButton(x,y,w,h,tintCol,text,null,null);
+			}
+			public void showButton(int x, int y, int w, int h,int tintCol,String text,String threeMedals){
+				displayButton(x,y,w,h,tintCol,text,null,threeMedals);
 			}
 			public void showButton(int x, int y, int w, int h,int tintCol,String text,PImage extraIcon){
-				displayButton(x,y,w,h,tintCol,text,extraIcon);
+				displayButton(x,y,w,h,tintCol,text,extraIcon,null);
 			}
 			
-			public void displayButton(int x, int y, int w, int h,int tintCol,String text,PImage extraIcon){
+			public void displayButton(int x, int y, int w, int h,int tintCol,String text,PImage extraIcon,String threeMedals){
 
 				if(tintCol!=-1)
 					tint(tintCol);
@@ -725,6 +834,32 @@ if(message.indexOf("0:00:00")<0){
 				if(extraIcon!=null){
 					imageMode(CENTER);
 					image(extraIcon,x+w-sw-(h/2),y+(h/2),(int)(h*.8),(int)(h*.8));
+					imageMode(CORNER);
+				}
+				
+				if(threeMedals!=null && threeMedals.length()>0){
+
+					imageMode(CENTER);
+					
+					
+					for(int i=0;i<3;i++){
+						if(threeMedals.length()>i){
+							if(threeMedals.charAt(i)=='1'){
+								image(goldMedal,(float) (x+w-sw-(h/(1.5)+(i*(int)(h*.3)))),y+(h/2),(int)(h*.3),(int)(h*.3));
+							}else
+							if(threeMedals.charAt(i)=='2'){
+								image(silverMedal,(float) (x+w-sw-(h/(1.5)+(i*(int)(h*.3)))),y+(h/2),(int)(h*.3),(int)(h*.3));
+							}else
+							if(threeMedals.charAt(i)=='3'){
+								image(bronzeMedal,(float) (x+w-sw-(h/(1.5)+(i*(int)(h*.3)))),y+(h/2),(int)(h*.3),(int)(h*.3));
+							}else
+								{
+								tint(0);
+									image(silverMedal,(float) (x+w-sw-(h/(1.5)+(i*(int)(h*.3)))),y+(h/2),(int)(h*.3),(int)(h*.3));
+								}
+							noTint();
+						}
+					}
 					imageMode(CORNER);
 				}
 				

@@ -77,6 +77,7 @@ int hurdlesHit=0;
 	int mh=(int) (sph/div);
 	int mw=(int) (spw/div);
 	public void reset(){
+		jumpingTargetHeight=0;
 		jumpingVelocity=0;
 		longJumpLength=0;
 		last3Speeds=new ArrayList<Float>();
@@ -97,6 +98,7 @@ int hurdlesHit=0;
 		y=0;
 		mx=6;
 		my=5;
+		jumpY=0;
 		jumping=false;
 		landed=false;
 		distanceTravelled=0;
@@ -122,7 +124,7 @@ int hurdlesHit=0;
 		
 		if(jumpY>0 && track==1){
 			moved=jumpingVelocity;
-			parent.parent.println("VELOCITY: "+jumpingVelocity);
+		//	parent.parent.println("VELOCITY: "+jumpingVelocity);
 		}
 		
 		
@@ -211,11 +213,11 @@ int hurdlesHit=0;
 		myRaceTime=(float)((longEndTime-parent.longStartTime)/1000000000.0f);
 		
 		if(parent.raceMode.equals("Time Trial") && track>1 ){
-			System.out.println("track = "+track);
-			System.out.println(parent.fastestTimeYet+" BOT was supposedto finish IN: "+(parent.finishTimes[track-2]));
+		//	System.out.println("track = "+track);
+		//	System.out.println(parent.fastestTimeYet+" BOT was supposedto finish IN: "+(parent.finishTimes[track-2]));
 		}
 			
-		System.out.println("BOT_ FINISHED THE RACE IN: "+((floatEndTime-parent.floatStartTime)/1000));
+	//	System.out.println("BOT_ FINISHED THE RACE IN: "+((floatEndTime-parent.floatStartTime)/1000));
 		if(!parent.player.finished)
 			parent.playerPosition++;
 		}

@@ -28,11 +28,7 @@ public class Player extends Athlete{
 		atEaseSpeed=0;
 		jumping=false;
 		jumpY=0;
-		if(parent.longJumpOn){
-			jumpingVelocity=0;
-			longJumpLength=(float) (((distanceTravelled)-(parent.track.jo)))+mw;
 		
-		}
 		drawSprites();
 		//sandBlast();
 		
@@ -41,7 +37,6 @@ public class Player extends Athlete{
 	
 	public void gatherSand(float amt){
 		amt/=100;
-		System.out.println("GATHER SAND: "+amt);
 		sandBitsX= new ArrayList<Float>();
 		sandBitsY= new ArrayList<Float>();
 		for(int i=0;i<amt;i++){
@@ -81,7 +76,7 @@ moveMe(sandBitsX.size());
 			 if(parent.hurdlesOn && distanceTravelled<parent.track.trackWidth  && distanceTravelled>parent.track.ho/2)
 				if((distanceTravelled)%(parent.track.ho)>parent.track.ho-1
 						||
-						(distanceTravelled)%(parent.track.ho)<(mw*3)){
+						(distanceTravelled)%(parent.track.ho)<(mw*5)){
 					if(jumpY<parent.track.hurdleHeight/1.1 && jumping==false){
 						String entry = "("+((int)((distanceTravelled+parent.convertInchesToPixels(3))/parent.track.ho))+"-1)";
 						if(parent.track.knockedHurdles.indexOf(entry)==-1){
@@ -109,9 +104,6 @@ moveMe(sandBitsX.size());
 							else{
 							
 							}
-							parent.parent.println("LJL: "+longJumpLength);
-							parent.parent.println("LJL INCHES: "+parent.convertPixelsToInches(longJumpLength)+parent.convertPixelsToInches(mw*5));
-							//gatherSand(jumpingVelocity);
 							drawSittingPosition();
 						
 							endRace();
@@ -135,7 +127,7 @@ moveMe(sandBitsX.size());
 		myRaceTime=(float)((longEndTime-parent.longStartTime)/1000000000.0f);
 		if(parent.longJumpOn){
 			jumpingVelocity=0;
-			longJumpLength=(float) (((distanceTravelled)-(parent.track.jo-mw*2.5))/10)+mw;
+			longJumpLength=parent.convertPixelsToInches((((distanceTravelled)-(parent.track.jo-(mw*5)))/5)+mw/5);
 		  parent.raceStage=7;
 		}
 		else
