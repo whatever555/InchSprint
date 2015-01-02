@@ -77,10 +77,10 @@ moveMe(sandBitsX.size());
 				if((distanceTravelled)%(parent.track.ho)>parent.track.ho-1
 						||
 						(distanceTravelled)%(parent.track.ho)<(mw*5)){
-					if(jumpY<parent.track.hurdleHeight/1.1 && jumping==false){
+					if(jumpY<parent.track.hurdleHeight/1.2 && jumping==false){
 						String entry = "("+((int)((distanceTravelled+parent.convertInchesToPixels(3))/parent.track.ho))+"-1)";
 						if(parent.track.knockedHurdles.indexOf(entry)==-1){
-							
+							parent.parent.v.vibrate(100);
 							parent.track.knockedHurdles+=entry;
 							parent.gameSounds.playSound("hurdle_drop",1,1,1);
 							hurdlesHit++;

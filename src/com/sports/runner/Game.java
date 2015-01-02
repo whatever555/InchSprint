@@ -27,7 +27,8 @@ public class Game extends PApplet{
 	
 	Vibrator v; // Vibrate for 500 milliseconds
 
-	int maxBots = 1;
+	String currentMode="NORMAL";
+	int maxBots = 5;
 	PImage sandGraphic;
 	PImage buttonGraphic;
 	PImage buttonLeftGraphic;
@@ -60,8 +61,8 @@ public class Game extends PApplet{
 	boolean loaded=false;
 	
 	String[] countryList = new String[233];
-   String countryName="";
-   int countryIndex=0;
+    String countryName="";
+    int countryIndex=0;
 	PImage myFlag;
 	
 	ArrayList<String> flashMessages;
@@ -70,6 +71,7 @@ public class Game extends PApplet{
 	float[] pbs;
 	
 	public void setup(){
+		orientation(PORTRAIT);
 		cds = new CDS();
 		goldMedal=loadImage("graphics/medals/gold.png");
 		silverMedal=loadImage("graphics/medals/silver.png");
@@ -92,7 +94,7 @@ public class Game extends PApplet{
 		championshipData="55555";
 		
 		flegs = loadImage("images/flegs.png");
-		countryList=new String[]{"Afghanistan","Albania","Algeria","American Samoa","Andorra","Angola","Anguilla","Antigua and Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central African Republic","Chad","Chile","China","Christmas Island","Colombia","Comoros","Cook Islands","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Côte d'Ivoire","Democratic Republic of the Congo","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macao","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Martinique","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","Netherlands Antilles","New Zealand","Nicaragua","Niger","Nigeria","Niue","Norfolk Island","North Korea","Norway","Oman","Pakistan","Palau","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Pitcairn Islands","Poland","Portugal","Puerto Rico","Qatar","Republic of the Congo","Romania","Russian Federation","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Pierre","Saint Vicent and the Grenadines","Samoa","San Marino","Sao Tomé and Príncipe","Saudi Arabia","Senegal","Serbia and Montenegro","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Soloman Islands","Somalia","South Africa","South Georgia","South Korea","Soviet Union","Spain","Sri Lanka","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Tibet","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Turks and Caicos Islands","Tuvalu","UAE","Uganda","Ukraine","United Kingdom","United States of America","Uruguay","US Virgin Islands","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Wallis and Futuna","Yemen","Zambia","Zimbabwe"};
+		countryList=new String[]{"Afghanistan","Albania","Algeria","American Samoa","Andorra","Angola","Anguilla","Antigua and Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central African Republic","Chad","Chile","China","Christmas Island","Colombia","Comoros","Cook Islands","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Cï¿½te d'Ivoire","Democratic Republic of the Congo","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macao","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Martinique","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","Netherlands Antilles","New Zealand","Nicaragua","Niger","Nigeria","Niue","Norfolk Island","North Korea","Norway","Oman","Pakistan","Palau","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Pitcairn Islands","Poland","Portugal","Puerto Rico","Qatar","Republic of the Congo","Romania","Russian Federation","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Pierre","Saint Vicent and the Grenadines","Samoa","San Marino","Sao Tomï¿½ and Prï¿½ncipe","Saudi Arabia","Senegal","Serbia and Montenegro","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Soloman Islands","Somalia","South Africa","South Georgia","South Korea","Soviet Union","Spain","Sri Lanka","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Tibet","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Turks and Caicos Islands","Tuvalu","UAE","Uganda","Ukraine","United Kingdom","United States of America","Uruguay","US Virgin Islands","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Wallis and Futuna","Yemen","Zambia","Zimbabwe"};
 		
 		countryName=getCountryName();
 		myFlag = getMyFlag();
@@ -168,10 +170,11 @@ public class Game extends PApplet{
 	public void showLoadingMessage(){
 		image(bgImage,0,0,displayWidth,displayHeight);
 		fill(30);
-		textSize(26);
+		textSize(displayWidth/20);
 		textAlign(CENTER,CENTER);
 		messageFont=createFont("fonts/messageFont.ttf", 34, true);
 		imageMode(CENTER);
+		fill(255);
 		image(homeIcon,displayWidth/2,(int)(displayHeight/2.1-homeIcon.height));
 		text("Loading...",displayWidth/2,displayHeight/2);
 		imageMode(CORNER);
@@ -198,7 +201,7 @@ public class Game extends PApplet{
 		rect(-1,-1,displayWidth+2,38);
 		textAlign(CENTER);
 		textFont(messageFont);
-		textSize(16);
+		textSize((int)((float)((float)16/480)*displayWidth));
 		fill(255);
 		text(str,displayWidth/2,28);
 		noStroke();
@@ -274,29 +277,41 @@ public class Game extends PApplet{
 		noStroke();
 		noTint();
 		rect(0,0,displayWidth,displayHeight);
-		int inc=10;
+		int inc=30;
 		textAlign(LEFT,TOP);
-		textSize(20);
 		textFont(messageFont);
+		textSize((int)((float)((float)40/480)*displayWidth));
 		
 		fill(255);
-		text("Event Details",5,5);
-		textSize(14);
-		int yy = 25;
+		text("Event Details",5,fixNumber(5));
+		textSize((int)((float)((float)30/480)*displayWidth));
+		int yy = 25+inc;
 		fill(120);
 		line(0,yy,0,yy);
 		fill(255);
-		yy+=18;
-		text("Competitors",5,yy);
-		text(currentEvent.bots,displayWidth/2,yy);
+		yy+=18+inc;
+		text("Competitors",5,fixNumber(yy));
+		text(currentEvent.bots,displayWidth/2,fixNumber(yy));
 
-		yy+=18;
-		text("Hurdles",5,yy);
-		text("No",displayWidth/2,yy);
+		String hurdlesOnString = "No";
+		if(currentEvent.hurdles){
+			hurdlesOnString="Yes";
+		}
+		yy+=18+inc;
+		text("Hurdles",5,fixNumber(yy));
+		text(hurdlesOnString,displayWidth/2,fixNumber(yy));
+
+		yy+=18+inc;
+		text("Track Length",5,fixNumber(yy));
+		text(currentEvent.trackLength+ " Inches",displayWidth/2,fixNumber(yy));
 		
-		yy+=18;
-		text("Track Length",5,yy);
-		text(currentEvent.trackLength+ " Inches",displayWidth/2,yy);
+		yy+=18+inc;
+		text("Target Position",5,fixNumber(yy));
+		text((int)currentEvent.minPos+ "",displayWidth/2,fixNumber(yy));
+		
+
+		yy+=18+inc*2;
+		text("Tap Anywhere to Continue..",5,fixNumber(yy));
 	}
 	
 	public void showMainMenuScreen(){
@@ -357,6 +372,10 @@ if(message.indexOf("0:00:00")<0){
 			    }
 			});
 			
+	}
+	
+	public int fixNumber(int n){
+		return (int)(((float)n/480)*displayWidth);
 	}
 	
 	public void onCreate(Bundle savedInstanceState) {
@@ -450,7 +469,7 @@ if(message.indexOf("0:00:00")<0){
 		public void mouseDragged(){
 			if(!activeMP.active)
 			if(loaded)
-			activeScreen.mouseDragged();
+				activeScreen.mouseDragged();
 		}
 		
 		
@@ -553,7 +572,7 @@ if(message.indexOf("0:00:00")<0){
 							race.lastY=race.getLastY(mouseY);
 							race.player.jumping=true;
 							race.jumpLoading=false;
-							race.player.jumpingTargetHeight = (float) (race.track.hurdleHeight*2);
+							race.player.jumpingTargetHeight = (float) (race.track.hurdleHeight*2.8);
 							float avgSpeed = 0;
 							for(int i=0;i<race.player.last3Speeds.size();i++){
 								avgSpeed+=race.player.last3Speeds.get(i);
@@ -563,7 +582,7 @@ if(message.indexOf("0:00:00")<0){
 							if( race.longJumpOn==true)
 								avgSpeed+=(race.moveY)+race.player.last3Speeds.get(race.player.last3Speeds.size()-1)+race.player.last3Speeds.get(race.player.last3Speeds.size()-2);
 							
-								race.player.jumpingVelocity=avgSpeed+5;
+								race.player.jumpingVelocity=(float) ((avgSpeed*1.3)+25);
 							
 						}
 				  }
@@ -810,10 +829,11 @@ if(message.indexOf("0:00:00")<0){
 			
 			public void displayButton(int x, int y, int w, int h,int tintCol,String text,PImage extraIcon,String threeMedals){
 
+				textSize((int)(h/2.5));
 				if(tintCol!=-1)
 					tint(tintCol);
 				
-				int sw=10;
+				int sw=fixNumber(10);
 				image(buttonLeftGraphic,x,y,sw,h);
 				image(buttonGraphic,x+sw,y,w-(sw*2),h);
 				image(buttonRightGraphic,x+w-sw,y,sw,h);
@@ -824,11 +844,11 @@ if(message.indexOf("0:00:00")<0){
 				if(text!=null){
 					fill(0);
 					textAlign(LEFT,CENTER);
-					text(text,x+sw-1,y+h/2-1);
+					text(text,(x)+sw-1,y+h/2-1);
 
 					fill(255);
 					textAlign(LEFT,CENTER);
-					text(text,x+sw+1,y+h/2+1);
+					text(text,(x)+sw+1,y+h/2+1);
 				}
 				
 				if(extraIcon!=null){

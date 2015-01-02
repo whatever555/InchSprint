@@ -77,6 +77,16 @@ int hurdlesHit=0;
 	int mh=(int) (sph/div);
 	int mw=(int) (spw/div);
 	public void reset(){
+		
+		if(parent.track != null)
+		{
+		sph = parent.track.trackHeight/2;
+		spw = (int)((float)(sph/148)*120);
+
+		mh=(int) (sph/div);
+		mw=(int) (spw/div);
+		}
+		
 		jumpingTargetHeight=0;
 		jumpingVelocity=0;
 		longJumpLength=0;
@@ -137,7 +147,7 @@ int hurdlesHit=0;
 		last3Speeds.add(moved);
 		
 		
-		x+=moved/20;
+		x+=((float)((moved/20)/parent.parent.displayWidth))*480;
 		distanceTravelled+=moved;
 		
 		if(distanceTravelled > (parent.track.trackWidth)){

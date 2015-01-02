@@ -45,6 +45,7 @@ boolean championshipRace=false;
 	  
 	public void loadMe(){
 		System.gc();
+		parent.maxBots=parent.trainingProgress*10;
 		menuHeight=parent.displayHeight;
 		  sportsFont=parent.createFont("fonts/sport.ttf", 24, true);
 			
@@ -62,7 +63,6 @@ boolean championshipRace=false;
 	
 	public void beginRace(){
 		 
-		    
 		    parent.showRaceScreen(-1,(int)parent.random(10)+1,false,botCount,hurdlesOn,raceLength,raceMode,ghostType,practiceMode,raceAgainst,longJumpOn);
 		
 	}
@@ -84,6 +84,7 @@ boolean championshipRace=false;
 	
 	public void showTimetrialOptions(){
 
+		parent.currentMode="TIMETRIAL";
 		menuHeading = "Time Trial";
 		buttons=new ArrayList<MenuButton>();
 		
@@ -125,6 +126,7 @@ boolean championshipRace=false;
 	
 	public void showTrainingOptions(){
 
+		parent.currentMode="TRAINING";
 		menuHeading = "Training Menu";
 		buttons=new ArrayList<MenuButton>();
 		int tp = parent.trainingProgress;
@@ -132,7 +134,7 @@ boolean championshipRace=false;
 		buttons.add(new MenuButton(this,"Practice Running",0,0-tp));
 		buttons.add(new MenuButton(this,"Practice Starts",1,1-tp));
 		buttons.add(new MenuButton(this,"Practice Hurdles",2,2-tp));
-		buttons.add(new MenuButton(this,"Practice Long Jump",3,3-tp));
+	//	buttons.add(new MenuButton(this,"Practice Long Jump",3,3-tp));
 		
 		botCount=0;
 		raceMode="Practice";
@@ -155,6 +157,8 @@ public void showPersonalBestOptions(){
 	}
 
 public void showChampionshipLevels(){
+
+	parent.currentMode="CHAMPIONSHIP";
 	 menuHeading = "Championship";
 		buttons=new ArrayList<MenuButton>();
 		int cnt=0;
@@ -287,7 +291,7 @@ public void showChampionshipEventLevels(String s){
 		
 		buttons=new ArrayList<MenuButton>();
 			
-		if(parent.trainingProgress>1){
+		if(parent.trainingProgress>=1){
 			buttons.add(new MenuButton(this,"Quick Race",0,-1));
 			buttons.add(new MenuButton(this,"Race",1,-1));
 			buttons.add(new MenuButton(this,"Time Trial",2,-1));
@@ -297,7 +301,7 @@ public void showChampionshipEventLevels(String s){
 			buttons.add(new MenuButton(this,"Time Trial",2,1,"Requires completion of basic training"));
 		}
 			buttons.add(new MenuButton(this,"Leaderboards",3,-1));
-		if(parent.trainingProgress>3){
+		if(parent.trainingProgress>=2){
 			buttons.add(new MenuButton(this,"Championship",4,-1));
 		}else{
 			buttons.add(new MenuButton(this,"Championship",4,1,"You must complete training to play"));
@@ -340,7 +344,7 @@ public void showChampionshipEventLevels(String s){
 		parent.rect(-2,-2,parent.displayWidth+4,buttonHeight+2);
 		parent.image(parent.homeIcon, buttonPaddingLeft, 4,buttonHeight-6,buttonHeight-6);
 		parent.textFont(parent.messageFont);
-		parent.textSize(22);
+		parent.textSize((int)(buttonHeight/2.5));
 		parent.textAlign(parent.CENTER,parent.CENTER);
 		parent.fill(255);
 		parent.text(menuHeading, parent.displayWidth/2,buttonHeight/2);
@@ -403,7 +407,8 @@ int bY=0;
 			}else
 			
 				if(buttons.get(i).text.equals("Quick Race")){
-					parent.showRaceScreen(-1,(int)parent.random(10)+1,false,12,false,60,"Race","No Ghost",practiceMode,"session",false);
+					parent.currentMode="QUICKRACE";
+					parent.showRaceScreen(-1,(int)parent.random(10)+1,false,(int)parent.random(14)+1,(int)parent.random(3)==1,randomRaceSize(),"Race","No Ghost",practiceMode,"session",false);
 				}else
 					if(buttons.get(i).text.equals("Account")){
 						showSwarmDashBoard();
@@ -443,6 +448,7 @@ int bY=0;
 						showRaceLengthOptions();
 				}else
 			if(buttons.get(i).text.equals("Race")){
+				parent.currentMode="RACE";
 				raceMode="Race";
 				showHurdleOptions();
 			   
@@ -562,7 +568,21 @@ int bY=0;
 		dragging=false;
 	}
 	
-	
+	int randRacSiz=1;
+	public int randomRaceSize(){
+
+		randRacSiz++;
+		if(randRacSiz%17==0)
+		return 800;
+		if(randRacSiz%13==0)
+		return 400;
+		if(randRacSiz%7==0)
+		return 200;
+		if(randRacSiz%5==0)
+		return 100;
+		
+		return 60;
+	}
 	
 		
 	}

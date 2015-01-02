@@ -35,6 +35,9 @@ public class MessagePop {
 	}
 	
 	public void initMe(Game parent,String header,MyCallback callback,int format,int style){
+
+		yOff=parent.fixNumber(yOff);
+		strHeight=parent.fixNumber(strHeight);
 		this.type=type;
 		this.style=style;
 		this.parent=parent;
@@ -60,7 +63,8 @@ public class MessagePop {
 		optionsStr.add(str);
 		optionsButs.add(isBut);
 		txtSizes.add(txtSize);
-		h=(optionsButs.size()*30)+yOff*2;
+		strHeight = ((int)((float)((float)txtSize/480)*parent.displayWidth));
+		h=(optionsButs.size()*(strHeight+parent.fixNumber(10)))+parent.fixNumber(yOff*2);
 		y=(parent.displayHeight-h)/2;
 	}
 	
@@ -69,12 +73,12 @@ public class MessagePop {
 			
 			if(format==2){
 				parent.textAlign(parent.CENTER);
-				yOff=3;
+				yOff=parent.fixNumber(3);
 				y = parent.displayHeight-(h+parent.displayHeight/12);
 			}
 			if(format==3){
 
-				yOff=3;
+				yOff=parent.fixNumber(3);
 				y = parent.displayHeight-((h*2)+parent.displayHeight/24);
 			}
 				parent.textFont(parent.messageFont);
@@ -110,17 +114,16 @@ public class MessagePop {
 	
 	public void drawStrings(){
 
-
+		int offGrow = parent.fixNumber(22);
 		parent.textAlign(parent.LEFT,parent.TOP);
-		parent.textSize(12);
+		parent.textSize((int)((float)((float)12/480)*parent.displayWidth));
 		//parent.textAlign(parent.LEFT);
 		for(int i=0;i<optionsStr.size();i++){
 
 			parent.fill(220,alpha);
 			
-			parent.textSize(txtSizes.get(i));
-		
-
+			parent.textSize((int)((float)((float)txtSizes.get(i)/480)*parent.displayWidth));
+			strHeight = ((int)((float)((float)txtSizes.get(i)/480)*parent.displayWidth));
 			if(optionsButs.get(i)){
 				//parent.fill(0,0,110,alpha);
 				//parent.rect(x,y+yOff+(i*strHeight),w,strHeight,3);
@@ -129,7 +132,7 @@ public class MessagePop {
 
 				parent.fill(250,alpha);
 			}
-			parent.text(optionsStr.get(i),x*2,y+yOff+(i*strHeight)+(strHeight/2));
+			parent.text(optionsStr.get(i),x*2,y+parent.fixNumber(yOff)+(i*offGrow+(strHeight/2)));
 			
 			
 		}

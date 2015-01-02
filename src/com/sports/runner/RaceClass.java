@@ -114,7 +114,9 @@ public class RaceClass extends Screen {
 			 parent.frameRate(60);
 			getInches();
 			parent.textFont(sportsFont);
-			parent.textSize(24);
+			parent.textSize((int)((float)((float)24/480)*parent.displayWidth));
+			parent.println("HERE IT IS : .... : "+(int)((float)((float)16/320)*parent.displayHeight));
+			
 			loadSounds();
 
 			player = new Player(this,1);
@@ -199,11 +201,11 @@ track.reset();
 			shortsSprites = new PImage[6][6];
 			
 
-			shoeBlock = parent.loadImage("images/runner/shoes.gif");
-			shortsBlock = parent.loadImage("images/runner/shorts.gif");
-			bodyBlock = parent.loadImage("images/runner/body.gif");
-			outlineBlock = parent.loadImage("images/runner/outline.gif");
-			tshirtBlock = parent.loadImage("images/runner/tshirt.gif");
+			shoeBlock = parent.loadImage("images/runner/shoes.png");
+			shortsBlock = parent.loadImage("images/runner/shorts.png");
+			bodyBlock = parent.loadImage("images/runner/body.png");
+			outlineBlock = parent.loadImage("images/runner/outline.png");
+			tshirtBlock = parent.loadImage("images/runner/tshirt.png");
 			   
 		    for(int x=0;x<6;x++)
 		    	for(int y=0;y<6;y++){
@@ -313,7 +315,7 @@ System.gc();
 					///if(millis()-lastMillis>=100){
 						if(dragging){
 							//if(jumpLoading==false)
-							moveY+=(parent.min(parent.mouseY,track.trackY+track.trackDisplayHeight)-lastY);
+							moveY+=(parent.min(getLastY(parent.mouseY),track.trackY+track.trackDisplayHeight)-lastY);
 							
 							
 							//lastX=mouseX;
@@ -345,7 +347,7 @@ System.gc();
 			}
 			if(raceStage==6 || raceStage == 7){
 				parent.textAlign(parent.CENTER,parent.CENTER);
-				parent.textSize(22);
+				parent.textSize((int)((float)((float)22/480)*parent.displayWidth));
 				if(!longJumpOn)
 				moveY=player.atEaseSpeed;
 				
@@ -353,15 +355,15 @@ System.gc();
 				updatePositions();
 				
 				
-				parent.fill(0,190);
+				parent.fill(0,160);
 				parent.rect(0,0,parent.displayWidth,parent.displayHeight,3);
 				parent.fill(255);
 				if(!training==true){
-				parent.text("Race time: "+player.myRaceTime,parent.displayWidth/2,(parent.displayHeight/2)-40);
+				parent.text("Race time: "+player.myRaceTime,parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 				}else{
 					if(practiceMode.equals("Starts")){
 						if(reactionSpeed!=999999999){
-						parent.text("Reaction Speed:",parent.displayWidth/2,(parent.displayHeight/2)-40);
+						parent.text("Reaction Speed:",parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 						if(reactionSpeed>.5)
 						parent.fill(200,0,0);
 						else
@@ -371,31 +373,31 @@ System.gc();
 							parent.fill(0,200,0);
 						parent.text(""+reactionSpeed,parent.displayWidth/2,(parent.displayHeight/2));
 						parent.fill(255);
-						parent.text("Awesome",parent.displayWidth/2,(parent.displayHeight/2)+40);
+						parent.text("Awesome",parent.displayWidth/2,(parent.displayHeight/2)+parent.fixNumber(40));
 						
 						}else{
 						parent.text(""+reactionSpeed,parent.displayWidth/2,(parent.displayHeight/2));
 						parent.fill(255);
-						parent.text("Try get it below .3 seconds.",parent.displayWidth/2,(parent.displayHeight/2)+40);
+						parent.text("Try get it below .3 seconds.",parent.displayWidth/2,(parent.displayHeight/2)+parent.fixNumber(40));
 						}
 						parent.fill(255);
 						}
 						else{
 						
 						if(r==0){
-							parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+							parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 							parent.text("Don't run before the gun!",parent.displayWidth/2,(parent.displayHeight/2));
 							}else
 							if(r==1){
-								parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+								parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 								parent.text("Practice, practice, practice!",parent.displayWidth/2,(parent.displayHeight/2));
 							}else
 								if(r==2){
-									parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+									parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 									parent.text("The gun comes just after the whistle!",parent.displayWidth/2,(parent.displayHeight/2));
 								}else
 									if(r==3){
-										parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+										parent.text("Too Fast!",parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 										parent.text("Wait for the gun/vibration",parent.displayWidth/2,(parent.displayHeight/2));
 									}
 						}
@@ -405,20 +407,20 @@ System.gc();
 						if(player.hurdlesHit>0){
 							
 							if(r==0){
-							parent.text("Ouch!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+							parent.text("Ouch!",parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 							parent.text("Hurdles can be difficult to master",parent.displayWidth/2,(parent.displayHeight/2));
 							}else
 							if(r==1){
-								parent.text("Close!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+								parent.text("Close!",parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 								parent.text("Remember to drag with two fingers.",parent.displayWidth/2,(parent.displayHeight/2));
 								
 							}else
 							if(r==2){
-								parent.text("Getting Better!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+								parent.text("Getting Better!",parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 								parent.text("Release touch before reaching hurdle",parent.displayWidth/2,(parent.displayHeight/2));
 							}else
 								if(r==3){
-									parent.text("Nope!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+									parent.text("Nope!",parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 									parent.text("Run faster for longer jumps",parent.displayWidth/2,(parent.displayHeight/2));
 								}
 						}
@@ -429,20 +431,20 @@ System.gc();
 						if(player.longJumpLength<=2){
 							
 							if(r==0){
-							parent.text("Nope!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+							parent.text("Nope!",parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 							parent.text("Remember to gain mometum before jumping",parent.displayWidth/2,(parent.displayHeight/2));
 							}else
 							if(r==1){
-								parent.text("Close!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+								parent.text("Close!",parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 								parent.text("Don't jump too late.",parent.displayWidth/2,(parent.displayHeight/2));
 								
 							}else
 							if(r==2){
-								parent.text("Getting Better!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+								parent.text("Getting Better!",parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 								parent.text("Drag fast before releasing to jump further",parent.displayWidth/2,(parent.displayHeight/2));
 							}else
 								if(r==3){
-									parent.text("Nope!",parent.displayWidth/2,(parent.displayHeight/2)-40);
+									parent.text("Nope!",parent.displayWidth/2,(parent.displayHeight/2)-parent.fixNumber(40));
 									parent.text("Run faster for longer jumps",parent.displayWidth/2,(parent.displayHeight/2));
 								}
 						}
@@ -455,7 +457,9 @@ System.gc();
 				//	rect(0,0,parent.displayWidth,parent.displayHeight,3);
 					
 					parent.fill(255);
-					parent.text("Tap Screen to Try Again",parent.displayWidth/2,(parent.displayHeight/2)+80);
+					if(parent.currentMode=="CHAMPIONSHIP")parent.text("Tap Screen to Return to Menu",parent.displayWidth/2,(parent.displayHeight/2)+parent.fixNumber(80));
+					else
+					parent.text("Tap Screen to Try Again",parent.displayWidth/2,(parent.displayHeight/2)+parent.fixNumber(80));
 					
 					
 					clickSetAllow=true;
@@ -464,7 +468,7 @@ System.gc();
 				}else{
 					parent.fill(255);
 					if(!training)
-					parent.text("Verifying Time",parent.displayWidth/2,(parent.displayHeight/2)+40);
+					parent.text("Verifying Time",parent.displayWidth/2,(parent.displayHeight/2)+parent.fixNumber(40));
 				}
 				if(!training){
 					if(raceMode.equals("Time Trial") && botCount>0 && player.myRaceTime < fastestTimeYet )
@@ -472,10 +476,10 @@ System.gc();
 					else if(raceMode.equals("Time Trial") && botCount>0)
 						playerPosition=2;
 					if(!longJumpOn)
-				parent.text("Position: "+playerPosition,parent.displayWidth/2,(parent.displayHeight/2)+120);
+				parent.text("Position: "+playerPosition,parent.displayWidth/2,(parent.displayHeight/2)+parent.fixNumber(120));
 				}
 				if(longJumpOn){
-					parent.text("Jump Length: "+(player.longJumpLength)+ " inches",parent.displayWidth/2,(parent.displayHeight/2)+120);
+					parent.text("Jump Length: "+(player.longJumpLength)+ " inches",parent.displayWidth/2,(parent.displayHeight/2)+parent.fixNumber(120));
 				}
 				
 			}
@@ -500,7 +504,7 @@ System.gc();
 					soundShotBeginRace(true);
 					if(!training==true){
 						falseStarts++;
-						parent.showSingleMessagePop(new String[]{"False Start!","",falseStarts+"/"+maxFalseStarts+" False starts","","Tap Screen to Restart",""},new MyCallback(){ 
+						parent.showSingleMessagePop(new String[]{"False Start!","","Wait for the gun sound before running!","","Tap Screen to Restart",""},new MyCallback(){ 
 							  public void onMessageClose(){ 
 								  setMeUp();
 							  }
@@ -574,7 +578,7 @@ System.gc();
 				ret=track.trackY;
 			if(ret>track.trackY+track.trackDisplayHeight)
 				ret=track.trackY+track.trackDisplayHeight;
-		
+
 			return ret;
 		}
 		
@@ -588,6 +592,11 @@ System.gc();
 			if(raceStage == 7 && clickSet==true && clickSetAllow==true){
 				clickSet=false;
 				parent.println("NOW I AM IN HERE ");
+				if(parent.currentMode.equals("CHAMPIONSHIP")){
+				parent.showMainMenuScreen();
+				parent.mainMenu.showChampionshipLevels();
+				}
+				else
 				setMeUp();
 			}
 			if(dragging==true){
@@ -679,7 +688,7 @@ System.gc();
 						if(comparisonFloat-(minPos/3)<minPos){
 							parent.setMedal('3');
 						}
-				}else if(playerPosition<=9){
+				}else if(playerPosition<=minPos){
 					parent.setMedal((""+playerPosition).charAt(0));
 				}
 					

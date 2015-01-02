@@ -78,7 +78,7 @@ float barSize;
 
 	 pdw=parent.parent.displayWidth/2;
 	 pdh=parent.parent.displayHeight/2;
-	 trackY=(parent.parent.displayHeight)-(trackDisplayHeight);
+	 trackY=(parent.parent.displayHeight)-((trackDisplayHeight)+(trackHeight/9)+(trackHeight/15));
 	 trackX=(pdw)-(trackDisplayWidth/2);
 	 
 	 trackHeight = trackY;
@@ -105,6 +105,7 @@ float barSize;
 	 bottomY=trackHeight-hurdleHeight;
 	 barSize = bottomY-topY;
 	 knockedHurdles="";
+	 hurdleHeight = (trackHeight/148)*45;
  }
  
  public void moveMe(float y){
@@ -227,7 +228,13 @@ float barSize;
 	 knockedHurdles="";
  }
  public void colorTrack(int alpha){
+	 colorTrack(alpha,false);
+ }
+ 
+ public void colorTrack(int alpha, boolean extraDark)
+ {
 	 parent.fill(colorIntensity,0,0,alpha);
+	 
 	 if(parent.training==true)
 		parent.fill(0,colorIntensity/2,0,alpha);
 	 else if(parent.raceMode.equals("Time Trial"))
@@ -324,8 +331,8 @@ public void drawFinishLine(){
 	 float nearX = lineDispX-offX+playerFat+parent.player.XOFF;
 	 
 	if(nearX<dw+20 && nearX>-20){
-		parent.parent.strokeWeight(10);
-	 parent.parent.stroke(255,0,0,250);
+		parent.parent.strokeWeight(20);
+	 parent.parent.stroke(255,255,255,250);
 	 float newX = nearX+((offX/barSize)*(trackHeight-trackHeight/divAmt))+5;
 	 parent.parent.line(nearX,(float)trackHeight/(float)divAmt,newX,trackHeight);
 	 parent.parent.line(newX,trackHeight,newX,trackHeight+trackHeight/9);

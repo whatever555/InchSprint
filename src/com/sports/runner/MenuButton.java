@@ -132,7 +132,7 @@ public class MenuButton {
 	int tweenStage = 0;
 	public int tweenInt(float x, float tx){
 		if(tweening){
-		float div=3+(index);
+		float div=(float) (3+((float)index*0.01));
 		if(tx>x)
 			x+=(tx-x)/div;
 		else
