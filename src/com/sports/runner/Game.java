@@ -28,7 +28,7 @@ public class Game extends PApplet{
 	Vibrator v; // Vibrate for 500 milliseconds
 
 	String currentMode="NORMAL";
-	int maxBots = 5;
+	int maxBots = 6;
 	PImage sandGraphic;
 	PImage buttonGraphic;
 	PImage buttonLeftGraphic;
@@ -214,10 +214,12 @@ public class Game extends PApplet{
 		}
 		
 		if(Integer.parseInt(""+med)<2){
+			println("GOT HERE MEDAL AREA");
 			if(maxBots<race.botCount){
+				println("GOT HERE "+maxBots+"  :::: "+race.botCount);
 				maxBots = race.botCount;
 
-				saveToCloud("maxBots",""+maxBots);
+				saveToCloud("Max Bots",""+maxBots);
 				flashMessages.add("Content Unlocked");
 			}
 		}
@@ -654,6 +656,10 @@ if(message.indexOf("0:00:00")<0){
 
 					    	 if(varName.equals("Championship Data"))
 						        	championshipData=(data);
+
+					    	 if(varName.equals("Max Bots"))
+						        	if(data.equals("0"))
+					        			data="6";
 					    	 
 					    	 if(varName.equals("Max Bots"))
 						        	maxBots=Integer.parseInt(data);

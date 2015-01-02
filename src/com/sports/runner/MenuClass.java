@@ -227,7 +227,7 @@ public void showChampionshipEventLevels(String s){
 		buttons.add(new MenuButton(this,"No Opponents",0,-1));
 		buttons.add(new MenuButton(this,"1 Opponent",1,-1));
 		int cnt=2;
-		for(int i=5;i<=40;i+=5){
+		for(int i=5;i<=80;i+=5){
 			if(i<=parent.maxBots)
 		buttons.add(new MenuButton(this,i+" Opponents",cnt,-1));
 			else
