@@ -45,7 +45,6 @@ boolean championshipRace=false;
 	  
 	public void loadMe(){
 		System.gc();
-		parent.maxBots=parent.trainingProgress*10;
 		menuHeight=parent.displayHeight;
 		  sportsFont=parent.createFont("fonts/sport.ttf", 24, true);
 			

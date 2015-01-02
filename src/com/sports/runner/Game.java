@@ -217,6 +217,7 @@ public class Game extends PApplet{
 			if(maxBots<race.botCount){
 				maxBots = race.botCount;
 
+				saveToCloud("maxBots",""+maxBots);
 				flashMessages.add("Content Unlocked");
 			}
 		}
@@ -650,9 +651,12 @@ if(message.indexOf("0:00:00")<0){
 					        
 					    	 if(varName.equals("Championship Progress"))
 						        	championshipProgress=Integer.parseInt(data);
-					    	 
+
 					    	 if(varName.equals("Championship Data"))
 						        	championshipData=(data);
+					    	 
+					    	 if(varName.equals("Max Bots"))
+						        	maxBots=Integer.parseInt(data);
 					    	 
 					        if(varName.equals("Personal Bests")){
 					        	if(data.equals("0"))
